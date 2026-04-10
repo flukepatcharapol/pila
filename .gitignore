@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+allure-results/
+allure-report/
+htmlcov/
+.coverage
+
+# uv
+uv.lock
+
+# Node
+node_modules/
+dist/
+.cache/
+playwright-report/
+test-results/
+
+# Environment
+.env
+.env.local
+.env.*.local
+# keep .env.test but not real secrets
+*.env.prod
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Docker
+*.log

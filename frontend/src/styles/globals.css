@@ -1,0 +1,291 @@
+/* src/styles/globals.css
+ *
+ * Global CSS Variables — Design Tokens สำหรับ Studio Management
+ * ทุก component ต้อง reference tokens เหล่านี้ ห้าม hardcode colors โดยตรง
+ * เหตุผล: เปลี่ยน theme ได้ง่าย, consistent ทั้งแอพ, รองรับ dark mode
+ *
+ * Source of truth: FE Design/azure_studio_pro/DESIGN.md
+ */
+
+/* ─── Light Mode (Default) ─────────────────────────────────────────────────────── */
+
+:root {
+  /* Primary Palette — Deep Sea Blue */
+  --color-primary:                #162839; /* Navigation, primary headers */
+  --color-primary-container:      #2c3e50; /* Gradient endpoint สำหรับ primary buttons */
+  --color-on-primary:             #ffffff; /* Text/icon บน primary background */
+  --color-on-primary-container:   #96a9be; /* Secondary text บน primary-container */
+  --color-primary-fixed:          #d1e4fb; /* Very light primary tint */
+  --color-primary-fixed-dim:      #b5c8df; /* Dimmed light primary */
+  --color-inverse-primary:        #b5c8df; /* Primary color บน dark background */
+
+  /* Secondary Palette — Steel Blue */
+  --color-secondary:              #395f94; /* Interactive elements, links */
+  --color-secondary-container:    #9ec2fe; /* Background สำหรับ secondary elements */
+  --color-on-secondary:           #ffffff;
+  --color-on-secondary-container: #284f83;
+  --color-secondary-fixed:        #d5e3ff;
+  --color-secondary-fixed-dim:    #a7c8ff;
+
+  /* Tertiary/Accent — Muted Teal */
+  --color-tertiary:               #54b6b5; /* CTAs, success states, active badges */
+  --color-tertiary-container:     #004444;
+  --color-on-tertiary:            #ffffff;
+  --color-on-tertiary-container:  #54b6b5;
+  --color-tertiary-fixed:         #93f2f2;
+
+  /* Surface Hierarchy — "Nested depth" system */
+  /* วิธีใช้: วาง lowest บน low บน main surface เพื่อสร้าง depth */
+  --color-surface:                #f8fafb; /* Canvas พื้นฐาน */
+  --color-surface-dim:            #d8dadb; /* Dimmed surface */
+  --color-surface-bright:         #f8fafb;
+  --color-surface-lowest:         #ffffff; /* Cards ที่ "ลอย" อยู่บนสุด */
+  --color-surface-low:            #f2f4f5; /* Secondary areas, sidebar */
+  --color-surface-high:           #e6e8e9; /* Inactive backgrounds, sunken trays */
+  --color-surface-highest:        #e1e3e4; /* Highest contrast surface */
+  --color-surface-tint:           #4e6073;
+  --color-background:             #f8fafb;
+  --color-inverse-surface:        #2d3132;
+  --color-inverse-on-surface:     #eff1f2;
+
+  /* Text Colors */
+  --color-on-surface:             #191c1d; /* Primary text (ห้ามใช้ pure black) */
+  --color-on-surface-variant:     #43474c; /* Secondary text, placeholders */
+
+  /* Outline */
+  --color-outline:                #73777f;
+  --color-outline-variant:        #c4c6cd; /* Ghost borders, dividers (ใช้ opacity ต่ำเสมอ) */
+
+  /* Error */
+  --color-error:                  #ba1a1a;
+  --color-error-container:        #ffdad6;
+  --color-on-error:               #ffffff;
+  --color-on-error-container:     #410002;
+
+  /* ─── Typography Scale ──────────────────────────────────────────────────────── */
+
+  /* Display (Manrope) — สำหรับ page titles, big numbers */
+  --font-display:                 'Manrope', 'Kanit', 'Sarabun', sans-serif;
+  --font-size-display-lg:         3.5rem;   /* 56px */
+  --font-size-display-md:         2.8rem;   /* 45px */
+  --font-size-display-sm:         2.25rem;  /* 36px */
+
+  /* Headline (Manrope) — section headers */
+  --font-size-headline-lg:        2rem;     /* 32px */
+  --font-size-headline-md:        1.75rem;  /* 28px */
+  --font-size-headline-sm:        1.5rem;   /* 24px */
+
+  /* Body/Labels (Inter) — content text */
+  --font-body:                    'Inter', sans-serif;
+  --font-size-body-lg:            1rem;     /* 16px */
+  --font-size-body-md:            0.875rem; /* 14px — main body size */
+  --font-size-body-sm:            0.75rem;  /* 12px — captions, labels */
+
+  /* Line Heights */
+  --line-height-body:             1.5;
+  --line-height-thai:             1.6;      /* Thai text ต้องมีระยะห่างพิเศษสำหรับ tone marks */
+  --line-height-headline:         1.2;
+
+  /* ─── Elevation & Shadows ───────────────────────────────────────────────────── */
+
+  /* Ambient shadow — ใช้เฉพาะนี้ ห้ามใช้ shadow ที่มี black */
+  --shadow-ambient:               0px 20px 40px rgba(25, 28, 29, 0.06);
+
+  /* Ghost border — ใช้เมื่อ accessibility ต้องการ border */
+  /* ใช้: border: 1px solid var(--color-outline-variant); opacity: 0.15 */
+  --border-ghost:                 1px solid rgba(196, 198, 205, 0.15);
+
+  /* ─── Glassmorphism ─────────────────────────────────────────────────────────── */
+
+  /* Floating elements เช่น navbar, modals ที่ "ลอย" บนเนื้อหา */
+  --glass-bg:                     rgba(248, 250, 251, 0.8);
+  --glass-blur:                   12px;
+  --glass-shadow:                 var(--shadow-ambient);
+
+  /* ─── Border Radius ─────────────────────────────────────────────────────────── */
+
+  --radius-sm:   0.25rem;   /* 4px — tags, badges */
+  --radius-md:   0.5rem;    /* 8px — buttons, inputs */
+  --radius-lg:   0.75rem;   /* 12px — cards, panels */
+  --radius-xl:   1rem;      /* 16px — modals, large cards */
+  --radius-2xl:  1.25rem;   /* 20px — feature cards */
+  --radius-full: 9999px;    /* pill — chips, badges, avatar */
+
+  /* ─── Spacing Scale ─────────────────────────────────────────────────────────── */
+
+  /* ใช้ rule "add 20% more than you think is enough" */
+  --space-1:  0.25rem;  /* 4px */
+  --space-2:  0.5rem;   /* 8px */
+  --space-3:  0.75rem;  /* 12px */
+  --space-4:  1rem;     /* 16px */
+  --space-5:  1.25rem;  /* 20px */
+  --space-6:  1.5rem;   /* 24px */
+  --space-8:  2rem;     /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+
+  /* ─── Transitions ───────────────────────────────────────────────────────────── */
+
+  --transition-fast:    150ms ease;
+  --transition-default: 200ms ease;
+  --transition-slow:    300ms ease;
+
+  /* ─── Z-Index Scale ─────────────────────────────────────────────────────────── */
+
+  --z-sidebar:  40;   /* Sidebar ลอยอยู่เหนือเนื้อหา */
+  --z-header:   50;   /* Header sticky */
+  --z-overlay:  60;   /* Overlay/backdrop */
+  --z-modal:    70;   /* Modals */
+  --z-toast:    80;   /* Toast notifications (สูงสุด) */
+}
+
+
+/* ─── Dark Mode ──────────────────────────────────────────────────────────────────
+ *
+ * ใช้ class-based dark mode (.dark บน <html>)
+ * ควบคุมผ่าน Settings > Dark Mode toggle
+ */
+
+.dark {
+  --color-primary:                #b5c8df;
+  --color-primary-container:      #36485b;
+  --color-on-primary:             #1e3145;
+  --color-on-primary-container:   #d1e4fb;
+
+  --color-secondary:              #a7c8ff;
+  --color-secondary-container:    #1e477b;
+  --color-on-secondary:           #003063;
+  --color-on-secondary-container: #d5e3ff;
+
+  --color-tertiary:               #54b6b5;
+  --color-tertiary-container:     #54b6b5;
+  --color-on-tertiary:            #002020;
+  --color-on-tertiary-container:  #93f2f2;
+
+  --color-surface:                #111416;
+  --color-surface-dim:            #111416;
+  --color-surface-bright:         #37393b;
+  --color-surface-lowest:         #0b0d0f;
+  --color-surface-low:            #191c1d;
+  --color-surface-high:           #2d3132;
+  --color-surface-highest:        #373a3b;
+  --color-background:             #111416;
+  --color-inverse-surface:        #e1e3e4;
+  --color-inverse-on-surface:     #2d3132;
+
+  --color-on-surface:             #e1e3e4;
+  --color-on-surface-variant:     #c4c6cd;
+  --color-outline:                #8d9199;
+  --color-outline-variant:        #43474c;
+
+  --glass-bg:                     rgba(17, 20, 22, 0.85);
+}
+
+
+/* ─── Base Reset & Global Styles ─────────────────────────────────────────────────
+ *
+ * Minimal reset — Tailwind handle ส่วนใหญ่
+ * เพิ่มแค่ส่วนที่ design system ต้องการ
+ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* ป้องกัน font size inflation บน mobile */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  /* ใช้ Inter เป็น default body font */
+  font-family: var(--font-body);
+  font-size: var(--font-size-body-md);
+  line-height: var(--line-height-body);
+  color: var(--color-on-surface);
+  background-color: var(--color-background);
+
+  /* Smooth font rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headline elements ใช้ Manrope */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  line-height: var(--line-height-headline);
+  color: var(--color-on-surface);
+  letter-spacing: -0.02em; /* tight tracking สำหรับ premium feel */
+}
+
+/* Thai text class — เพิ่ม line-height สำหรับ tone marks */
+.thai, [lang="th"], [lang="th-TH"] {
+  line-height: var(--line-height-thai); /* 1.6 สำหรับ วรรณยุกต์ */
+  font-family: var(--font-body);       /* Inter มี Thai support ดี */
+}
+
+/* Focus ring — accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Remove focus ring สำหรับ mouse users */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Scrollbar styling (webkit) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-surface-low);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-outline-variant);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-on-surface-variant);
+}
+
+/* ─── Utility Classes ───────────────────────────────────────────────────────────── */
+
+/* Glassmorphism — ใช้กับ floating elements */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glass-shadow);
+}
+
+/* Ambient shadow — floating cards */
+.shadow-ambient {
+  box-shadow: var(--shadow-ambient);
+}
+
+/* Ghost border — accessibility boundary */
+.border-ghost {
+  border: var(--border-ghost);
+}
+
+/* Page section fade-in animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp var(--transition-default) ease both;
+}
