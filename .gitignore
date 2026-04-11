@@ -1,1 +1,6 @@
-﻿.claude/
+﻿# Local config
+.claude/
+
+# Environment variables
+.env
+.env.*
