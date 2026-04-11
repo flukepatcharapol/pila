@@ -3,17 +3,43 @@ api/services/customer.py
 
 Business logic สำหรับ Customer management
 """
+from sqlalchemy.orm import Session
 
 
-def generate_customer_code(branch_prefix: str, source_code: str, sequence: int) -> str:
+def generate_customer_code(branch_prefix: str, source_code: str, db: Session) -> str:
     """
     สร้าง customer code ตามรูปแบบ: BranchPrefix-SourceCode#Sequence
-    เช่น: BKK-WEB#001
+    เช่น: BPY-MKT#001
 
-    - branch_prefix: prefix ของ branch เช่น BKK, PTY
-    - source_code: รหัสแหล่งที่มา เช่น WEB, IGS, REF
-    - sequence: ลำดับ customer ใน branch+source combination
+    ใช้ CustomerCodeCounter เพื่อ auto-increment sequence ต่อ branch+source combination
     """
-    # format sequence เป็น 3 หลัก เช่น 1 → 001
+    from api.models.customer import CustomerCodeCounter
+    from api.models.branch import Branch
+
+    branch = db.query(Branch).filter(Branch.prefix == branch_prefix).first()
+    branch_id = branch.id if branch else 0
+
+    counter = (
+        db.query(CustomerCodeCounter)
+        .filter_by(source_code=source_code, branch_id=branch_id)
+        .with_for_update()
+        .first()
+    )
+
+    if counter:
+        counter.last_sequence += 1
+        sequence = counter.last_sequence
+    else:
+        counter = CustomerCodeCounter(
+            branch_id=branch_id,
+            source_code=source_code,
+            last_sequence=1,
+        )
+        db.add(counter)
+        sequence = 1
+
+    db.flush()
+
+    # Format: BPY-MKT001 (ตาม requirement sec 5)
     seq_str = str(sequence).zfill(3)
-    return f"{branch_prefix}-{source_code}#{seq_str}"
+    return f"{branch_prefix}-{source_code}{seq_str}"

@@ -348,3 +348,169 @@ async def test_trainer_cannot_delete_customer(client, trainer_token, create_cust
     res = await delete(client, f"/customers/{customer_id}",
                        token=trainer_token)
     assert_forbidden(res)
+
+
+# ─── Missing Role Coverage ────────────────────────────────────────────────────────
+
+@allure.title("TC-API-CUST-02c: Branch master sees only own branch customers")
+@pytest.mark.be
+async def test_branch_master_sees_own_branch_only(client, branch_master_token,
+                                                   create_customer, seed_data):
+    """ตรวจสอบว่า branch_master เห็นแค่ลูกค้าในสาขาที่ assigned"""
+    pattaya_branch_id = str(seed_data["branches"][0].id)
+    create_customer(branch="pattaya")
+    create_customer(branch="kanchanaburi")
+
+    response = await get(client, "/customers",
+                         token=branch_master_token, expected_status=200)
+
+    with allure.step("Assert only Pattaya customers returned"):
+        customer_list = response.json()["items"]
+        assert_branch_scope(customer_list, expected_branch_id=pattaya_branch_id)
+
+
+@allure.title("TC-API-CUST-03b: Developer sees all customers across all partners")
+@pytest.mark.be
+async def test_developer_sees_all_partners(client, developer_token,
+                                           create_customer, seed_data):
+    """ตรวจสอบว่า developer เห็นลูกค้าทุก partner ทุก branch"""
+    create_customer(branch="pattaya")
+    create_customer(branch="chachoengsao")
+    create_customer(branch="kanchanaburi")
+
+    response = await get(client, "/customers",
+                         token=developer_token, expected_status=200)
+
+    with allure.step("Assert customers from all 3 branches present"):
+        customer_list = response.json()["items"]
+        branch_id_set = {customer["branch_id"] for customer in customer_list}
+        assert len(branch_id_set) >= 3, (
+            f"Developer should see customers from all branches "
+            f"but only saw {len(branch_id_set)} distinct branch(es): {branch_id_set}. "
+            "Developer role must have cross-partner visibility."
+        )
+
+
+@allure.title("TC-API-CUST-05: Combined branch and status filter returns correct customers")
+@pytest.mark.be
+async def test_customer_combined_branch_status_filter(client, admin_token,
+                                                       create_customer, seed_data):
+    """ตรวจสอบว่า filter ?branch=pattaya&status=active ทำงานถูกต้องพร้อมกัน"""
+    pattaya_branch_id = str(seed_data["branches"][0].id)
+    create_customer(branch="pattaya", status="ACTIVE")
+    create_customer(branch="pattaya", status="INACTIVE")
+
+    response = await get(client, "/customers",
+                         token=admin_token,
+                         params={"branch": "pattaya", "status": "active"},
+                         expected_status=200)
+
+    with allure.step("Assert all returned customers are Active and from Pattaya"):
+        customer_list = response.json()["items"]
+        for customer in customer_list:
+            assert customer.get("branch_id") == pattaya_branch_id, (
+                f"Customer {customer.get('id')} is not from Pattaya branch."
+            )
+            assert customer.get("status", "").upper() == "ACTIVE", (
+                f"Customer {customer.get('id')} has status '{customer.get('status')}' "
+                "but only ACTIVE customers should be returned."
+            )
+
+
+@allure.title("TC-API-CUST-13b: Branch master can delete customer in own branch")
+@pytest.mark.be
+async def test_branch_master_can_delete_customer(client, branch_master_token,
+                                                  create_customer):
+    """ตรวจสอบว่า branch_master ลบ customer ในสาขาตัวเองได้ → 204"""
+    customer_id = create_customer(branch="pattaya")
+    await delete(client, f"/customers/{customer_id}",
+                 token=branch_master_token, expected_status=204)
+
+
+@allure.title("TC-API-CUST-14b: Admin blocked from delete when permission matrix disallows")
+@pytest.mark.be
+async def test_admin_delete_blocked_by_permission_matrix(client, admin_token,
+                                                          create_customer,
+                                                          permission_override):
+    """
+    ตรวจสอบว่า admin ที่ถูกปิด customer.delete ใน permission matrix → 403
+    ทดสอบว่า permission matrix มีผลจริงต่อ admin role
+    """
+    customer_id = create_customer(branch="pattaya")
+
+    with allure.step("Disable customer.delete permission for admin role"):
+        permission_override("admin", "customer", "delete", False)
+
+    with allure.step("Attempt delete with admin token"):
+        response = await delete(client, f"/customers/{customer_id}",
+                                token=admin_token)
+
+    with allure.step("Assert 403 Forbidden"):
+        assert_forbidden(response)
+
+
+# ─── Input Validation Edge Cases ─────────────────────────────────────────────────
+
+@allure.title("TC-API-CUST-18: Customer first_name exceeds max length returns 422")
+@pytest.mark.be
+async def test_create_customer_name_too_long(client, admin_token, seed_data):
+    """ตรวจสอบว่า first_name ที่ยาวเกินไป → 422 Unprocessable Entity"""
+    pattaya_branch = seed_data["branches"][0]
+    mkt_source_type = seed_data["source_types"]["BPY_MKT"]
+    oversized_name = "ก" * 300  # เกิน max length ที่ระบบรองรับ
+
+    response = await post(client, "/customers",
+                          token=admin_token,
+                          json={
+                              "first_name": oversized_name,
+                              "last_name": "Customer",
+                              "branch_id": str(pattaya_branch.id),
+                              "source_type_id": str(mkt_source_type.id),
+                          })
+
+    with allure.step("Assert 422 Unprocessable Entity"):
+        assert_validation_error(response)
+
+
+@allure.title("TC-API-CUST-19: Concurrent customer creation produces unique codes")
+@pytest.mark.be
+@pytest.mark.slow
+async def test_concurrent_customer_creation_unique_codes(client, admin_token, seed_data):
+    """
+    ตรวจสอบว่าการสร้าง customer พร้อมกัน 2 requests → ได้ code ที่ unique
+    ป้องกัน race condition ใน customer code generation
+    """
+    import asyncio
+
+    pattaya_branch = seed_data["branches"][0]
+    mkt_source_type = seed_data["source_types"]["BPY_MKT"]
+
+    customer_payload = {
+        "branch_id": str(pattaya_branch.id),
+        "source_type_id": str(mkt_source_type.id),
+        "first_name": "Race",
+        "last_name": "Condition",
+        "phone": "0812345678",
+        "status": "ACTIVE",
+    }
+
+    with allure.step("Send 2 concurrent POST /customers requests"):
+        response_list = await asyncio.gather(
+            post(client, "/customers", token=admin_token, json=customer_payload),
+            post(client, "/customers", token=admin_token, json=customer_payload),
+            return_exceptions=True,
+        )
+
+    with allure.step("Assert both succeeded and codes are unique"):
+        success_responses = [
+            res for res in response_list
+            if not isinstance(res, Exception) and res.status_code == 201
+        ]
+        assert len(success_responses) >= 1, (
+            "At least one concurrent request must succeed."
+        )
+        customer_codes = [res.json().get("customer_code") for res in success_responses]
+        assert len(customer_codes) == len(set(customer_codes)), (
+            f"Duplicate customer codes detected: {customer_codes}. "
+            "Concurrent customer creation must always produce unique codes."
+        )

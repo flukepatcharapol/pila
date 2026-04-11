@@ -405,3 +405,169 @@ async def test_internal_requires_api_key_not_jwt(client, admin_token):
             f"but got {res.status_code}. "
             "Internal endpoints must only accept Developer API Key."
         )
+
+
+# ─── AUTH-18: Temporary Token Cannot Access Protected Routes ─────────────────────
+
+@allure.title("TC-API-AUTH-18: Temporary token (pre-PIN) returns 401 on protected routes")
+@pytest.mark.be
+@pytest.mark.security
+async def test_temporary_token_rejected_on_protected_route(client, seed_data):
+    """
+    ตรวจสอบว่า temporary_token ที่ได้หลัง login (ก่อน verify PIN)
+    ไม่สามารถใช้เรียก protected endpoints ได้ → ต้องได้ 401
+    """
+    with allure.step("Login to obtain temporary token (pre-PIN)"):
+        login_response = await post(client, "/auth/login", json={
+            "email": "owner@test.com",
+            "password": "test_pass",
+        }, expected_status=200)
+        temporary_token = login_response.json()["temporary_token"]
+
+    with allure.step("Use temporary token to call protected endpoint"):
+        protected_response = await get(
+            client, "/customers",
+            token=temporary_token,
+        )
+
+    with allure.step("Assert 401 — temporary token must not grant resource access"):
+        assert protected_response.status_code == 401, (
+            f"Expected 401 when using temporary (pre-PIN) token on protected route "
+            f"but got {protected_response.status_code}. "
+            "Temporary tokens must only be used for PIN verification, "
+            "not for accessing protected resources."
+        )
+
+
+# ─── AUTH-20: Password Forgot — Unknown Email Returns 200 ────────────────────────
+
+@allure.title("TC-API-AUTH-20: Password forgot with unknown email returns 200 (security)")
+@pytest.mark.be
+@pytest.mark.security
+async def test_password_forgot_unknown_email_returns_200(client):
+    """
+    ตรวจสอบว่า forgot password ด้วย email ที่ไม่มีในระบบ → ได้ 200 เหมือนกัน
+    ป้องกัน email enumeration attack — ระบบต้องไม่เปิดเผยว่า email มีอยู่หรือไม่
+    """
+    with allure.step("Submit forgot password with unknown email"):
+        response = await post(client, "/auth/password/forgot", json={
+            "email": "nobody_unknown@test.com",
+        })
+
+    with allure.step("Assert 200 OK — response must be identical regardless of email existence"):
+        assert response.status_code == 200, (
+            f"Expected 200 OK for unknown email in forgot password "
+            f"but got {response.status_code}. "
+            "Returning different status for unknown emails enables email enumeration attacks."
+        )
+
+
+# ─── AUTH-22: Password Reset — Expired Token ─────────────────────────────────────
+
+@allure.title("TC-API-AUTH-22: Password reset with expired token returns 400")
+@pytest.mark.be
+async def test_password_reset_expired_token_returns_400(client):
+    """
+    ตรวจสอบว่า reset password ด้วย token ที่หมดอายุ → 400 Bad Request
+    """
+    with allure.step("Submit reset with known-expired token"):
+        response = await post(client, "/auth/password/reset", json={
+            "token": "expired_or_invalid_reset_token",
+            "new_password": "NewPass123",
+        })
+
+    with allure.step("Assert 400 Bad Request"):
+        assert response.status_code == 400, (
+            f"Expected 400 for expired reset token but got {response.status_code}. "
+            "Expired reset tokens must be rejected."
+        )
+        error_detail = response.json().get("detail", "")
+        assert "expired" in error_detail.lower() or "invalid" in error_detail.lower(), (
+            f"Error detail must mention 'expired' or 'invalid' but got: '{error_detail}'"
+        )
+
+
+# ─── AUTH-23 & AUTH-24: Password Change While Logged In ──────────────────────────
+
+@allure.title("TC-API-AUTH-23: Change password while logged in — success")
+@pytest.mark.be
+async def test_password_change_while_logged_in(client, admin_token):
+    """
+    ตรวจสอบว่า user ที่ login แล้วสามารถเปลี่ยน password ตัวเองได้
+    """
+    with allure.step("Change password with correct old password"):
+        response = await post(client, "/auth/password/change",
+                              token=admin_token,
+                              json={
+                                  "old_password": "test_pass",
+                                  "new_password": "NewSecurePass456",
+                              }, expected_status=200)
+
+    with allure.step("Assert 200 OK — password changed successfully"):
+        assert response.status_code == 200, (
+            f"Expected 200 OK for valid password change but got {response.status_code}."
+        )
+
+
+@allure.title("TC-API-AUTH-24: Change password with wrong old password returns 401")
+@pytest.mark.be
+async def test_password_change_wrong_old_password(client, admin_token):
+    """
+    ตรวจสอบว่า เปลี่ยน password ด้วย old_password ผิด → 401 Unauthorized
+    """
+    with allure.step("Submit password change with wrong old password"):
+        response = await post(client, "/auth/password/change",
+                              token=admin_token,
+                              json={
+                                  "old_password": "wrong_old_password",
+                                  "new_password": "NewPass123",
+                              })
+
+    with allure.step("Assert 401 Unauthorized"):
+        assert response.status_code == 401, (
+            f"Expected 401 when old password is wrong but got {response.status_code}. "
+            "Password change must verify the current password before allowing update."
+        )
+
+
+# ─── AUTH-26: Internal Assign PIN ────────────────────────────────────────────────
+
+@allure.title("TC-API-AUTH-26: Developer API key can assign PIN and unlock account")
+@pytest.mark.be
+@pytest.mark.security
+async def test_internal_assign_pin(client, seed_data):
+    """
+    ตรวจสอบว่า developer API key สามารถ force-assign PIN และ unlock account ได้
+    ใช้ในกรณี admin/support ต้องการ reset PIN โดยตรง
+    """
+    target_user_id = seed_data["users"]["admin"].id
+    developer_api_key = "test_developer_api_key"
+
+    with allure.step("Assign new PIN via internal endpoint"):
+        response = await post(
+            client,
+            f"/internal/assign-pin/{target_user_id}",
+            json={"new_pin": "999999"},
+            api_key=developer_api_key,
+            expected_status=200,
+        )
+
+    with allure.step("Assert PIN assigned and account unlocked"):
+        response_data = response.json()
+        assert response_data is not None, "Response must not be empty"
+
+    with allure.step("Verify new PIN works for login flow"):
+        login_response = await post(client, "/auth/login", json={
+            "email": "admin@test.com",
+            "password": "test_pass",
+        }, expected_status=200)
+        temporary_token = login_response.json()["temporary_token"]
+
+        pin_response = await post(client, "/auth/pin/verify",
+                                  token=temporary_token,
+                                  json={"pin": "999999"},
+                                  expected_status=200)
+        assert "access_token" in pin_response.json(), (
+            "New PIN must work after internal assign-pin. "
+            "If PIN verify fails, the assign-pin endpoint did not persist the change."
+        )

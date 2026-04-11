@@ -51,12 +51,11 @@ async def request(
     _log_request(method, url, payload=json, headers=headers, params=params)
 
     # ส่ง HTTP request จริงผ่าน httpx AsyncClient
-    response = await getattr(client, method.lower())(
-        url,
-        json=json,
-        params=params,
-        headers=headers,
-    )
+    # GET/DELETE ไม่รับ json body
+    kwargs: dict = {"params": params, "headers": headers}
+    if method.upper() not in ("GET", "DELETE", "HEAD"):
+        kwargs["json"] = json
+    response = await getattr(client, method.lower())(url, **kwargs)
 
     # Log response เข้า Allure หลังได้รับ
     _log_response(response)
