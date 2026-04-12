@@ -6,7 +6,7 @@
 
 import uuid
 import pytest
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -163,6 +163,19 @@ def seed_data(test_engine):
     session.add_all([developer, owner, branch_master, admin, trainer_user])
     session.commit()
 
+    # ─── PinOtp (seed สำหรับ test_pin_reset_valid_otp) ───────────────────────────
+    # สร้าง OTP record สำหรับ owner — ใช้ค่า "654321" (fixed test OTP)
+    # expires far in the future เพื่อไม่หมดอายุระหว่าง test session
+    from api.models.user import PinOtp as PinOtpModel
+    pin_otp_seed = PinOtpModel(
+        user_id=owner.id,
+        otp_hash=hash_pin("654321"),
+        expires_at=datetime.utcnow() + timedelta(days=365),
+        used=False,
+    )
+    session.add(pin_otp_seed)
+    session.commit()
+
     yield {
         "partner": partner,
         "branches": branch_list,
@@ -270,6 +283,17 @@ def create_customer(db_session, seed_data):
         db_session.add(CustomerHourBalance(
             customer_id=customer.id,
             remaining=kwargs.get("initial_hours", 0),
+        ))
+        db_session.flush()
+
+        # สร้าง activity log เพื่อให้ GET /activity-log มี entries ให้ query
+        from api.models.activity_log import ActivityLog as _ActivityLog
+        db_session.add(_ActivityLog(
+            action="customer.create",
+            target_type="customer",
+            target_id=str(customer.id),
+            branch_id=target_branch.id,
+            partner_id=target_branch.partner_id,
         ))
         db_session.flush()
 

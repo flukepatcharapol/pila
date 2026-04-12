@@ -6,7 +6,7 @@ Dashboard endpoint:
 """
 from uuid import UUID
 from typing import Optional
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 
 from api.database import get_db
@@ -22,6 +22,8 @@ def get_dashboard(
     start_date: Optional[str] = Query(None),
     end_date: Optional[str] = Query(None),
     branch_id: Optional[UUID] = Query(None),
+    branch: Optional[str] = Query(None),
+    partner: Optional[str] = Query(None),
     current_user: dict = Depends(require_pin_verified),
     db: Session = Depends(get_db),
 ):
@@ -33,6 +35,12 @@ def get_dashboard(
       owner        → branch_master view + all branches
       developer    → owner view + cross-partner
     """
+    role = current_user.get("role", "").upper()
+
+    # branch=all is only allowed for OWNER/DEVELOPER
+    if branch == "all" and role not in ("OWNER", "DEVELOPER"):
+        raise HTTPException(status_code=403, detail="Forbidden")
+
     return dashboard_service.get_dashboard(
         current_user, db,
         range_type=range,

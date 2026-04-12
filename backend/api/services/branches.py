@@ -54,6 +54,10 @@ def get_branch(branch_id: uuid.UUID, current_user: dict, db: Session) -> dict:
 
 
 def create_branch(payload: dict, current_user: dict, db: Session) -> dict:
+    role = current_user.get("role", "").upper()
+    if role not in ("OWNER", "DEVELOPER"):
+        raise HTTPException(status_code=403, detail="Forbidden")
+
     partner_id = _to_uuid(current_user.get("partner_id"))
     b = Branch(
         partner_id=partner_id,
@@ -71,6 +75,10 @@ def create_branch(payload: dict, current_user: dict, db: Session) -> dict:
 
 
 def update_branch(branch_id: uuid.UUID, payload: dict, current_user: dict, db: Session) -> dict:
+    role = current_user.get("role", "").upper()
+    if role not in ("OWNER", "DEVELOPER", "BRANCH_MASTER"):
+        raise HTTPException(status_code=403, detail="Forbidden")
+
     b = db.query(Branch).filter_by(id=branch_id).first()
     if not b:
         raise HTTPException(status_code=404, detail="Branch not found")
@@ -79,6 +87,20 @@ def update_branch(branch_id: uuid.UUID, payload: dict, current_user: dict, db: S
     for field in ["name", "opening_time", "closing_time", "is_active"]:
         if field in payload and payload[field] is not None:
             setattr(b, field, payload[field])
+
+    # Handle source_types updates (e.g. change code/label)
+    source_types_list = payload.get("source_types")
+    if source_types_list:
+        for st_data in source_types_list:
+            st_id = _to_uuid(st_data.get("id"))
+            if st_id:
+                st = db.query(SourceType).filter_by(id=st_id, branch_id=branch_id).first()
+                if st:
+                    if "code" in st_data and st_data["code"]:
+                        st.code = st_data["code"].upper()
+                    if "label" in st_data and st_data["label"]:
+                        st.label = st_data["label"]
+
     db.flush()
 
     activity_log(db, current_user, "branch.edit", "branch", str(branch_id),

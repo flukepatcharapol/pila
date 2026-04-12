@@ -18,6 +18,8 @@ from api.models.customer import Customer
 from api.models.order import Order
 from api.models.booking import Booking
 from api.models.customer_hour import CustomerHourLog
+from api.models.user import User
+from api.models.trainer import Trainer
 
 
 def _to_uuid(val) -> uuid.UUID | None:
@@ -109,12 +111,51 @@ def get_dashboard(current_user: dict, db: Session,
         "total_bookings": total_bookings,
     }
 
-    # branch_master+ เพิ่ม outstanding
+    # branch_master+ เพิ่ม outstanding + breakdowns
     if role in ("BRANCH_MASTER", "OWNER", "DEVELOPER"):
         outstanding_result = order_q.with_entities(
             func.coalesce(func.sum(Order.total_price - Order.paid_amount), 0)
         ).scalar()
         result["total_outstanding"] = float(outstanding_result or 0)
+
+        # breakdown_by_admin: group orders by created_by user
+        admin_rows = (
+            order_q_period
+            .filter(Order.created_by.isnot(None))
+            .with_entities(Order.created_by, func.count(Order.id), func.sum(Order.total_price))
+            .group_by(Order.created_by)
+            .all()
+        )
+        result["breakdown_by_admin"] = [
+            {
+                "user_id": str(row[0]),
+                "order_count": int(row[1]),
+                "total_revenue": float(row[2] or 0),
+            }
+            for row in admin_rows
+        ]
+
+        # breakdown_by_trainer: group deductions by trainer_id
+        trainer_rows = (
+            deduct_q
+            .filter(CustomerHourLog.trainer_id.isnot(None))
+            .with_entities(CustomerHourLog.trainer_id, func.count(CustomerHourLog.id), func.sum(func.abs(CustomerHourLog.amount)))
+            .group_by(CustomerHourLog.trainer_id)
+            .all()
+        )
+        result["breakdown_by_trainer"] = [
+            {
+                "trainer_id": str(row[0]),
+                "session_count": int(row[1]),
+                "total_hours": float(row[2] or 0),
+            }
+            for row in trainer_rows
+        ]
+
+    # trainer gets their own session stats
+    if role == "TRAINER":
+        result["total_hours"] = total_hours_deducted
+        result["session_count"] = total_bookings
 
     return result
 

@@ -12,7 +12,8 @@ Booking endpoints:
 """
 import uuid
 from uuid import UUID
-from typing import Optional
+from typing import Optional, List
+from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, Query, Header, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -47,8 +48,10 @@ class ExternalBookingRequest(BaseModel):
     branch_id: str
     customer_id: str
     trainer_id: Optional[str] = None
-    start_time: str
-    end_time: str
+    start_time: Optional[str] = None
+    end_time: Optional[str] = None
+    slots: Optional[int] = None          # number of 1-hour slots from start_time
+    slot_times: Optional[List[str]] = None  # list of "HH:MM" times (must be contiguous)
     notes: Optional[str] = None
 
 
@@ -166,11 +169,54 @@ def external_booking(
     if expected_key and x_api_key != expected_key:
         raise HTTPException(status_code=401, detail="Invalid API key")
 
-    # สร้าง booking แบบ external
-    payload = body.model_dump()
-    payload["booking_type"] = "CUSTOMER"
-    payload["booking_source"] = "EXTERNAL_API"
+    start_time_str = body.start_time
+    end_time_str = body.end_time
 
-    # current_user สำหรับ external = system user
+    # Case 1: slot_times provided — validate contiguous, compute start/end
+    if body.slot_times:
+        times = sorted(body.slot_times)
+        # Each slot is 1 hour — check contiguous
+        for i in range(1, len(times)):
+            h_prev = int(times[i-1].split(":")[0])
+            h_curr = int(times[i].split(":")[0])
+            if h_curr - h_prev != 1:
+                raise HTTPException(status_code=400, detail="Slot times must be contiguous (1-hour intervals)")
+        # Use date from start_time if provided, else today
+        from datetime import date as date_type
+        base_date = datetime.fromisoformat(body.start_time).date() if body.start_time else date_type.today()
+        start_time_str = f"{base_date}T{times[0]}:00"
+        end_time_str = f"{base_date}T{times[-1].split(':')[0].zfill(2)}:{times[-1].split(':')[1]}:00"
+        # end_time = last slot + 1 hour
+        last_h = int(times[-1].split(":")[0]) + 1
+        end_time_str = f"{base_date}T{str(last_h).zfill(2)}:00:00"
+
+    # Case 2: slots count provided — compute end_time from start_time + slots hours
+    elif body.slots and body.start_time:
+        start_dt = datetime.fromisoformat(body.start_time)
+        end_dt = start_dt + timedelta(hours=body.slots)
+        start_time_str = body.start_time
+        end_time_str = end_dt.isoformat()
+
+    # Validate we have both start and end
+    if not start_time_str or not end_time_str:
+        raise HTTPException(status_code=400, detail="Must provide start_time+end_time, start_time+slots, or slot_times")
+
+    # Cross-day validation
+    start_dt = datetime.fromisoformat(start_time_str)
+    end_dt = datetime.fromisoformat(end_time_str)
+    if start_dt.date() != end_dt.date():
+        raise HTTPException(status_code=400, detail="Booking must be within the same day")
+
+    payload = {
+        "branch_id": body.branch_id,
+        "customer_id": body.customer_id,
+        "trainer_id": body.trainer_id,
+        "start_time": start_time_str,
+        "end_time": end_time_str,
+        "notes": body.notes,
+        "booking_type": "CUSTOMER",
+        "booking_source": "EXTERNAL_API",
+    }
+
     system_user = {"role": "EXTERNAL", "sub": None, "partner_id": None, "branch_id": None}
     return booking_service.create_booking(payload, system_user, db)

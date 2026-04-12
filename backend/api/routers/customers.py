@@ -55,6 +55,19 @@ class CreateCustomerRequest(BaseModel):
                 raise ValueError("Invalid email format")
         return v
 
+    @field_validator("birthday")
+    @classmethod
+    def validate_birthday(cls, v):
+        if v is not None and v != "":
+            from datetime import date
+            try:
+                bday = date.fromisoformat(v)
+            except ValueError:
+                raise ValueError("Invalid date format for birthday")
+            if bday > date.today():
+                raise ValueError("Birthday cannot be in the future")
+        return v
+
 
 class UpdateCustomerRequest(BaseModel):
     first_name: Optional[str] = None

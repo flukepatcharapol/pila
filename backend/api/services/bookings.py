@@ -87,13 +87,13 @@ def list_bookings(current_user: dict, db: Session, page: int = 1, page_size: int
         query = query.filter(Booking.trainer_id == _to_uuid(trainer_id))
     if date:
         query = query.filter(
-            Booking.start_time >= f"{date}T00:00:00",
-            Booking.start_time <= f"{date}T23:59:59",
+            Booking.start_time >= datetime.fromisoformat(f"{date}T00:00:00"),
+            Booking.start_time <= datetime.fromisoformat(f"{date}T23:59:59"),
         )
     if start_date:
-        query = query.filter(Booking.start_time >= f"{start_date}T00:00:00")
+        query = query.filter(Booking.start_time >= datetime.fromisoformat(f"{start_date}T00:00:00"))
     if end_date:
-        query = query.filter(Booking.start_time <= f"{end_date}T23:59:59")
+        query = query.filter(Booking.start_time <= datetime.fromisoformat(f"{end_date}T23:59:59"))
     total = query.count()
     items = query.order_by(Booking.start_time).offset((page - 1) * page_size).limit(page_size).all()
     return {"items": [_booking_to_dict(b) for b in items], "total": total, "page": page, "page_size": page_size}
@@ -110,9 +110,17 @@ def create_booking(payload: dict, current_user: dict, db: Session) -> dict:
     """สร้าง booking — trainer optional สำหรับ external booking"""
     branch_id = _to_uuid(payload["branch_id"])
     trainer_id = _to_uuid(payload.get("trainer_id"))
+    role = current_user.get("role", "").upper()
 
-    # ตรวจสอบว่า trainer อยู่ใน branch เดียวกัน (ถ้ามี trainer)
-    if trainer_id:
+    # TRAINER role: can only book with own user ID as trainer_id
+    if role == "TRAINER":
+        current_sub = current_user.get("sub")
+        if trainer_id is not None and str(trainer_id) != str(current_sub):
+            raise HTTPException(status_code=403, detail="Forbidden")
+        # Store trainer_id as None (User ID ≠ Trainer entity ID)
+        trainer_id = None
+    elif trainer_id:
+        # ตรวจสอบว่า trainer อยู่ใน branch เดียวกัน (ถ้ามี trainer)
         trainer = db.query(Trainer).filter_by(id=trainer_id).first()
         if not trainer or trainer.branch_id != branch_id:
             raise HTTPException(status_code=400, detail="Trainer does not belong to the specified branch")

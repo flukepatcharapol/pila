@@ -8,6 +8,7 @@ Settings + Google OAuth endpoints:
   DELETE /settings/google/disconnect — disconnect Google account
   GET    /settings/google/storage    — Drive storage usage
 """
+import uuid
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -52,7 +53,7 @@ def get_settings(
     if not sub:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    user_id = int(sub)
+    user_id = uuid.UUID(str(sub))
     pref = db.query(UserPreference).filter_by(user_id=user_id).first()
     if not pref:
         # Return defaults ถ้ายังไม่มีใน DB
@@ -72,7 +73,7 @@ def update_settings(
     if not sub:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    user_id = int(sub)
+    user_id = uuid.UUID(str(sub))
     pref = db.query(UserPreference).filter_by(user_id=user_id).first()
 
     if pref:
@@ -104,7 +105,7 @@ def connect_google(
     if not sub:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    user_id = int(sub)
+    user_id = uuid.UUID(str(sub))
     expires_at = datetime.fromisoformat(body.token_expires_at)
 
     existing = db.query(GoogleToken).filter_by(user_id=user_id).first()
@@ -137,7 +138,7 @@ def disconnect_google(
     if not sub:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    user_id = int(sub)
+    user_id = uuid.UUID(str(sub))
     token = db.query(GoogleToken).filter_by(user_id=user_id).first()
     if token:
         db.delete(token)
@@ -156,7 +157,7 @@ def get_google_settings(
     if not sub:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    user_id = int(sub)
+    user_id = uuid.UUID(str(sub))
     token = db.query(GoogleToken).filter_by(user_id=user_id).first()
     if not token:
         return {"connected": False, "email": None}
@@ -182,7 +183,7 @@ def get_google_storage(
     if not sub:
         raise HTTPException(status_code=401, detail="Not authenticated")
 
-    user_id = int(sub)
+    user_id = uuid.UUID(str(sub))
     token = db.query(GoogleToken).filter_by(user_id=user_id).first()
     if not token:
         raise HTTPException(status_code=400, detail="Google account not connected")

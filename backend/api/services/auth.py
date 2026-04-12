@@ -21,7 +21,7 @@ from api.utils.auth import (
 from api.config import settings
 
 # Constants
-MAX_LOGIN_ATTEMPTS = 10        # block ที่ 10 ครั้งใน 15 นาที
+MAX_LOGIN_ATTEMPTS = 9         # block เมื่อมี failed attempts >= 9 (ครั้งที่ 10 ถูก block)
 MAX_PIN_ATTEMPTS = 5           # lock หลัง 5 ครั้ง
 MAX_OTP_REQUESTS = 3           # rate limit OTP ใน 60 วิ
 OTP_WINDOW_SECONDS = 60
@@ -162,6 +162,7 @@ def verify_pin_and_issue_token(temp_token_payload: dict, pin: str, db: Session) 
         token_jti=jti,
         expires_at=expires_at,
         is_active=True,
+        email=user.email,
     ))
     db.flush()
 
@@ -170,12 +171,38 @@ def verify_pin_and_issue_token(temp_token_payload: dict, pin: str, db: Session) 
 
 def logout(token_payload: dict, db: Session) -> dict:
     """Invalidate UserSession โดย mark is_active=False"""
+    import uuid as _uuid
     jti = token_payload.get("jti")
     if jti:
         session = db.query(UserSession).filter_by(token_jti=jti).first()
         if session:
             session.is_active = False
             db.flush()
+        else:
+            # ไม่มี session record → สร้าง invalidation record เพื่อป้องกันการใช้ token ซ้ำ
+            user_id_str = token_payload.get("sub")
+            if user_id_str:
+                try:
+                    user_id = _uuid.UUID(str(user_id_str))
+                except (ValueError, AttributeError):
+                    user_id = None
+                if user_id:
+                    exp = token_payload.get("exp", 0)
+                    try:
+                        from datetime import timezone
+                        expires_at = datetime.fromtimestamp(exp, tz=timezone.utc).replace(tzinfo=None)
+                    except (OSError, ValueError, OverflowError):
+                        expires_at = datetime.utcnow() + timedelta(hours=8)
+                    user = db.query(User).filter_by(id=user_id).first()
+                    email = user.email if user else "invalidated@logout"
+                    db.add(UserSession(
+                        user_id=user_id,
+                        token_jti=jti,
+                        expires_at=expires_at,
+                        is_active=False,
+                        email=email,
+                    ))
+                    db.flush()
     return {"message": "Logged out successfully"}
 
 

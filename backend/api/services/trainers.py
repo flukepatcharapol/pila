@@ -145,7 +145,7 @@ def delete_trainer(trainer_id: uuid.UUID, current_user: dict, db: Session) -> No
     # INT-04: ไม่ลบ trainer ที่ยังมี active booking อยู่
     active_bookings = db.query(Booking).filter(
         Booking.trainer_id == trainer_id,
-        Booking.status.in_(["PENDING", "CONFIRMED"]),
+        Booking.status.in_(["PENDING", "CONFIRMED", "pending", "confirmed"]),
     ).count()
     if active_bookings > 0:
         raise HTTPException(

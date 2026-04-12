@@ -109,25 +109,13 @@ def get_line_qr(
     """
     branch_id = current_user.get("branch_id")
 
-    qr_codes = [
-        {
-            "type": "DEVELOPER",
-            "label": "Developer Support",
-            "qr_image_url": "/static/qr/developer.png",
-            "branch_id": None,
-        }
-    ]
+    developer_qr_url = "/static/qr/developer.png"
+    branch_qr_url = f"/static/qr/branch_{branch_id}.png" if branch_id else None
 
-    # เพิ่ม branch QR ถ้า user อยู่ใน branch
-    if branch_id:
-        qr_codes.append({
-            "type": "BRANCH",
-            "label": f"Branch {branch_id} Group Chat",
-            "qr_image_url": f"/static/qr/branch_{branch_id}.png",
-            "branch_id": str(branch_id),
-        })
-
-    return {"items": qr_codes}
+    return {
+        "developer_qr_url": developer_qr_url,
+        "branch_qr_url": branch_qr_url,
+    }
 
 
 @router.get("/help/faq")

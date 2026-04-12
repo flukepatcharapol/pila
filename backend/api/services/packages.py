@@ -188,7 +188,7 @@ def delete_package(package_id: uuid.UUID, current_user: dict, db: Session) -> No
     if in_orders > 0:
         raise HTTPException(
             status_code=409,
-            detail="Cannot delete package referenced in existing orders",
+            detail="Package referenced by existing orders",
         )
 
     db.delete(p)

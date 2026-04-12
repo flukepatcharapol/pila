@@ -12,7 +12,7 @@ Branch endpoints:
   PUT    /branches/:id/source-types/:stid
 """
 from uuid import UUID
-from typing import Optional
+from typing import Optional, List
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -32,11 +32,18 @@ class CreateBranchRequest(BaseModel):
     is_active: bool = True
 
 
+class SourceTypeUpdateItem(BaseModel):
+    id: Optional[str] = None
+    code: Optional[str] = None
+    label: Optional[str] = None
+
+
 class UpdateBranchRequest(BaseModel):
     name: Optional[str] = None
     opening_time: Optional[str] = None
     closing_time: Optional[str] = None
     is_active: Optional[bool] = None
+    source_types: Optional[List[SourceTypeUpdateItem]] = None
 
 
 class CreateSourceTypeRequest(BaseModel):
@@ -81,7 +88,7 @@ def update_branch(
     current_user: dict = Depends(require_pin_verified),
     db: Session = Depends(get_db),
 ):
-    return branch_service.update_branch(branch_id, body.model_dump(exclude_none=True), current_user, db)
+    return branch_service.update_branch(branch_id, body.model_dump(), current_user, db)
 
 
 @router.delete("/branches/{branch_id}", status_code=204)

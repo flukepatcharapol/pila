@@ -153,7 +153,7 @@ def update_order(order_id: uuid.UUID, payload: dict, current_user: dict, db: Ses
         if field in payload:
             setattr(order, field, payload[field])
     db.flush()
-    _log(db, current_user, "order.update", str(order_id))
+    _log(db, current_user, "order.edit", str(order_id))
     return _order_to_dict(order)
 
 

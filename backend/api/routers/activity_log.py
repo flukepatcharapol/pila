@@ -50,6 +50,7 @@ def list_activity_log(
                 "target_type": l.target_type,
                 "detail": l.detail,
                 "created_at": str(l.created_at),
+                "timestamp": str(l.created_at),  # alias สำหรับ created_at
             }
             for l in items
         ],

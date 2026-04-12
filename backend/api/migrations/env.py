@@ -7,9 +7,17 @@ Alembic environment configuration
 import os
 import sys
 from logging.config import fileConfig
+from pathlib import Path
 
 from sqlalchemy import engine_from_config, pool
 from alembic import context
+
+# โหลด .env จาก backend/ อัตโนมัติ ถ้ายังไม่มี DATABASE_URL ใน environment
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+except ImportError:
+    pass
 
 # เพิ่ม backend/api ใน path เพื่อ import api package ได้
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))

@@ -11,7 +11,7 @@ Trainer endpoints:
 from uuid import UUID
 from typing import Optional
 from fastapi import APIRouter, Depends, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from sqlalchemy.orm import Session
 
 from api.database import get_db
@@ -29,6 +29,15 @@ class CreateTrainerRequest(BaseModel):
     profile_photo_url: Optional[str] = None
     status: str = "ACTIVE"
 
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, v):
+        if v is not None and v != "":
+            import re
+            if not re.match(r"^[^@]+@[^@]+\.[^@]+$", v):
+                raise ValueError("Invalid email format")
+        return v
+
 
 class UpdateTrainerRequest(BaseModel):
     name: Optional[str] = None
@@ -36,6 +45,15 @@ class UpdateTrainerRequest(BaseModel):
     email: Optional[str] = None
     profile_photo_url: Optional[str] = None
     status: Optional[str] = None
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, v):
+        if v is not None and v != "":
+            import re
+            if not re.match(r"^[^@]+@[^@]+\.[^@]+$", v):
+                raise ValueError("Invalid email format")
+        return v
 
 
 @router.get("/trainers")

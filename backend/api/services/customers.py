@@ -254,12 +254,9 @@ def _check_delete_permission(current_user: dict, db: Session):
         return
 
     if role == "ADMIN":
-        # ตรวจ permission matrix
-        from api.models.permission import PermissionMatrix
-        perm = db.query(PermissionMatrix).filter_by(
-            role="admin", feature_name="customer", action="delete"
-        ).first()
-        if perm and not perm.is_allowed:
+        # ตรวจ permission matrix (ใช้ uppercase ตามที่เก็บใน DB)
+        from api.services.permissions import check_permission
+        if not check_permission(db, "ADMIN", "customer", "DELETE"):
             raise HTTPException(status_code=403, detail="Permission denied")
         return
 

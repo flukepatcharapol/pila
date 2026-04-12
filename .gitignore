@@ -5,3 +5,20 @@
 # Environment variables
 .env
 .env.*
+
+# Report from allure
+allure*
+
+# cache
+*pycache*
+.pytest_cache/
+.venv/
+.env.test
+.env.local
+.env.development
+.env.production
+.env.test
+.env.local
+.env.development
+.env.production
+__pycache__/
