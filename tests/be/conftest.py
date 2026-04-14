@@ -27,6 +27,7 @@ from api.utils.auth import (
     create_jwt_token,       # สร้าง JWT token สำหรับ test
 )
 from api.services.customer import generate_customer_code
+from helpers.common_api import post
 
 
 # ─── Database Engine ─────────────────────────────────────────────────────────────
@@ -44,10 +45,11 @@ def test_engine():
 
 
 @pytest.fixture(scope="function")
-def db_session(test_engine):
+def db_session(request, test_engine):
     """
     สร้าง database session สำหรับแต่ละ test function
-    scope="function" = rollback ทุกอย่างหลัง test จบ → tests แยกจากกัน 100%
+    ค่าเริ่มต้น: rollback หลัง test จบ → tests แยกจากกัน 100%
+    เมื่อใช้ --keep-db: commit แทน rollback → ข้อมูลยังอยู่ใน pila_test สำหรับตรวจสอบ
     """
     connection = test_engine.connect()
     transaction = connection.begin()
@@ -55,8 +57,91 @@ def db_session(test_engine):
     session = test_session_factory()
     yield session
     session.close()
-    transaction.rollback()
+    if request.config.getoption("--keep-db"):
+        transaction.commit()
+    else:
+        transaction.rollback()
     connection.close()
+
+
+@pytest.fixture(autouse=True)
+def reset_mutated_seed_state(request, test_engine):
+    """
+    เมื่อใช้ --keep-db: reset state ที่ High Risk tests เปลี่ยนไปจาก run ก่อนหน้า
+    ทำงานก่อนทุก test (autouse) แต่จะ reset จริงเฉพาะเมื่อ --keep-db เปิดอยู่
+
+    สิ่งที่ reset:
+    - LoginAttempt records ของ owner@test.com (test_login_brute_force_protection)
+    - admin.pin_locked → False (test_pin_lockout_after_five_attempts)
+    - seeded PinOtp.used → False (test_pin_reset_valid_otp)
+    - PinOtp records ที่สร้างโดย test (short-lived) → ลบ เพื่อ reset rate limit
+    """
+    if not request.config.getoption("--keep-db"):
+        yield
+        return
+
+    from api.models.user import User as _User, PinOtp as _PinOtp, LoginAttempt as _LoginAttempt
+
+    s = sessionmaker(bind=test_engine)()
+    try:
+        # 1. ล้าง LoginAttempt ของ owner (brute force test สร้าง 10 records)
+        s.query(_LoginAttempt).filter_by(email="owner@test.com").delete()
+
+        # 2. Reset admin.pin_locked → False (PIN lockout test ตั้งค่านี้เป็น True)
+        admin_user = s.query(_User).filter_by(email="admin@test.com").first()
+        if admin_user and admin_user.pin_locked:
+            admin_user.pin_locked = False
+
+        # 3. Reset seeded PinOtp ของ owner → used=False
+        #    seeded record มี expires_at = 1 ปีข้างหน้า → ใช้ threshold 30 วันแบ่งแยก
+        threshold = datetime.utcnow() + timedelta(days=30)
+        seed_otp = s.query(_PinOtp).filter(_PinOtp.expires_at > threshold).first()
+        if seed_otp and seed_otp.used:
+            seed_otp.used = False
+
+        # 4. ลบ PinOtp records ที่ test สร้าง (expires ใน 10 นาที)
+        #    เพื่อ reset OTP rate limit สำหรับ test_pin_forgot_rate_limit
+        s.query(_PinOtp).filter(_PinOtp.expires_at <= threshold).delete()
+
+        s.commit()
+    finally:
+        s.close()
+
+    yield
+
+
+@pytest.fixture
+async def password_session_via_login(client, seed_data):
+    """Login and return raw password session token + metadata"""
+    res = await post(client, "/auth/login", json={
+        "email": "owner@test.com",
+        "password": "test_pass",
+    }, expected_status=200)
+    data = res.json()
+    return {
+        "token": data.get("password_session_token") or data.get("temporary_token"),
+        "expires_in": data.get("expires_in", 2592000),
+    }
+
+
+@pytest.fixture
+async def full_auth_via_api(client, seed_data):
+    """Full login + PIN verify, returns (password_token, access_jwt)"""
+    # Step 1: login
+    login_res = await post(client, "/auth/login", json={
+        "email": "owner@test.com",
+        "password": "test_pass",
+    }, expected_status=200)
+    password_token = login_res.json().get("password_session_token") or login_res.json().get("temporary_token")
+
+    # Step 2: PIN verify
+    pin_res = await post(client, "/auth/pin/verify",
+        json={"pin": "123456"},
+        token=password_token,
+        expected_status=200)
+    access_jwt = pin_res.json()["access_token"]
+
+    return password_token, access_jwt
 
 
 @pytest.fixture(scope="function")

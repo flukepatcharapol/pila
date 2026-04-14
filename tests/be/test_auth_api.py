@@ -5,6 +5,7 @@
 
 import pytest
 import allure
+from datetime import datetime, timedelta
 from helpers.common_api import (
     get, post, put, delete,
     assert_forbidden,
@@ -170,6 +171,7 @@ async def test_pin_forgot_valid_email(client, seed_data):
 @allure.title("TC-API-AUTH-13: OTP request rate limited (3 per 60s)")
 @pytest.mark.be
 @pytest.mark.security
+@pytest.mark.isolated_last
 async def test_pin_forgot_rate_limit(client, seed_data):
     """
     ตรวจสอบ rate limiting: ขอ OTP >3 ครั้งใน 60 วิ → 429 Too Many Requests
@@ -535,6 +537,7 @@ async def test_password_change_wrong_old_password(client, admin_token):
 @allure.title("TC-API-AUTH-26: Developer API key can assign PIN and unlock account")
 @pytest.mark.be
 @pytest.mark.security
+@pytest.mark.isolated_last
 async def test_internal_assign_pin(client, seed_data):
     """
     ตรวจสอบว่า developer API key สามารถ force-assign PIN และ unlock account ได้
@@ -571,3 +574,236 @@ async def test_internal_assign_pin(client, seed_data):
             "New PIN must work after internal assign-pin. "
             "If PIN verify fails, the assign-pin endpoint did not persist the change."
         )
+
+
+# ─── Dual-Session Tests ───────────────────────────────────────────────────────
+
+@allure.title("TC-API-AUTH-DS-01: Login returns opaque token and creates password_sessions row")
+@pytest.mark.be
+async def test_login_returns_opaque_token_and_creates_db_row(client, seed_data, db_session):
+    """Login must return opaque token (not JWT), and create a password_sessions row"""
+    res = await post(client, "/auth/login", json={
+        "email": "owner@test.com", "password": "test_pass"
+    }, expected_status=200)
+    data = res.json()
+
+    # Assert: response has password_session_token (opaque — not 3 JWT parts)
+    token = data.get("password_session_token") or data.get("temporary_token")
+    assert token, "Response must contain password_session_token"
+    assert len(token.split(".")) != 3, "password_session_token must NOT be a JWT (no 3-part dot format)"
+    assert data.get("expires_in"), "Response must contain expires_in"
+
+    # Assert: DB row created
+    from api.models.user import PasswordSession
+    owner = seed_data["users"]["owner"]
+    rows = db_session.query(PasswordSession).filter_by(user_id=owner.id, is_active=True).all()
+    assert len(rows) >= 1, "password_sessions row must be created after login"
+    row = rows[-1]
+    assert row.expires_at > datetime.utcnow(), "expires_at must be in the future"
+
+
+@allure.title("TC-API-AUTH-DS-02: PIN verify returns 6h access JWT and creates UserSession")
+@pytest.mark.be
+async def test_pin_verify_returns_6h_jwt(client, seed_data, db_session, password_session_via_login):
+    """PIN verify with valid opaque token must return 6h access JWT"""
+    from jose import jwt as pyjwt
+    from api.models.user import UserSession
+
+    res = await post(client, "/auth/pin/verify",
+        json={"pin": "123456"},
+        token=password_session_via_login["token"],
+        expected_status=200)
+    data = res.json()
+
+    assert "access_token" in data, "Response must contain access_token"
+    assert data.get("expires_in"), "Response must contain expires_in"
+    assert data.get("token_type") == "bearer"
+
+    # Assert: JWT exp is ~6 hours from now
+    import time
+    payload = pyjwt.decode(
+        data["access_token"],
+        key="",
+        options={"verify_signature": False, "verify_exp": False},
+    )
+    exp = payload.get("exp", 0)
+    now = int(time.time())
+    remaining_hours = (exp - now) / 3600
+    assert 5.5 <= remaining_hours <= 6.5, f"JWT must expire ~6h from now, got {remaining_hours:.1f}h remaining"
+    assert payload.get("pin_verified") is True
+
+    # Assert: UserSession row created
+    owner = seed_data["users"]["owner"]
+    sessions = db_session.query(UserSession).filter_by(user_id=owner.id, is_active=True).all()
+    assert len(sessions) >= 1, "UserSession must be created after PIN verify"
+
+
+@allure.title("TC-API-AUTH-DS-03: Re-enter PIN with valid opaque after 6h expiry returns new JWT")
+@pytest.mark.be
+async def test_reenter_pin_with_valid_password_session(client, seed_data, password_session_via_login):
+    """Opaque password token can be reused to get a new access JWT (simulates 6h expiry scenario)"""
+    # Get first access JWT
+    res1 = await post(client, "/auth/pin/verify",
+        json={"pin": "123456"},
+        token=password_session_via_login["token"],
+        expected_status=200)
+    jwt1 = res1.json()["access_token"]
+
+    # Get second access JWT using same opaque (simulates re-PIN after 6h)
+    res2 = await post(client, "/auth/pin/verify",
+        json={"pin": "123456"},
+        token=password_session_via_login["token"],
+        expected_status=200)
+    jwt2 = res2.json()["access_token"]
+
+    assert jwt1 != jwt2, "Second PIN verify must return a new (different) JWT"
+
+
+@allure.title("TC-API-AUTH-DS-04: Expired password session returns 401 session_expired")
+@pytest.mark.be
+async def test_expired_password_session_returns_401(client, seed_data, db_session):
+    """Manually expire a password session row → pin/verify must return 401 session_expired"""
+    from api.models.user import PasswordSession
+    import hashlib, secrets
+
+    # Create a manually expired password session
+    raw_token = secrets.token_urlsafe(32)
+    token_hash = hashlib.sha256(raw_token.encode()).hexdigest()
+    owner = seed_data["users"]["owner"]
+    expired_session = PasswordSession(
+        user_id=owner.id,
+        token_hash=token_hash,
+        expires_at=datetime.utcnow() - timedelta(hours=1),  # expired 1h ago
+        is_active=True,
+    )
+    db_session.add(expired_session)
+    db_session.flush()
+
+    res = await post(client, "/auth/pin/verify",
+        json={"pin": "123456"},
+        token=raw_token,
+        expected_status=401)
+
+    data = res.json()
+    error_code = data.get("detail", {}).get("error_code") if isinstance(data.get("detail"), dict) else data.get("error_code")
+    assert error_code == "session_expired", f"Expected session_expired, got {data}"
+
+
+@allure.title("TC-API-AUTH-DS-05: Wrong PIN returns 401 invalid_pin (not session_expired)")
+@pytest.mark.be
+async def test_wrong_pin_returns_invalid_pin_error_code(client, seed_data, password_session_via_login):
+    """Wrong PIN must return error_code=invalid_pin, not session_expired"""
+    res = await post(client, "/auth/pin/verify",
+        json={"pin": "000000"},  # wrong PIN
+        token=password_session_via_login["token"],
+        expected_status=401)
+
+    data = res.json()
+    detail = data.get("detail")
+    # error_code could be in detail dict or top-level
+    if isinstance(detail, dict):
+        error_code = detail.get("error_code")
+    else:
+        error_code = data.get("error_code") or detail
+
+    assert error_code in ("invalid_pin", "Invalid PIN"), f"Expected invalid_pin, got: {data}"
+
+
+@allure.title("TC-API-AUTH-DS-06: Protected route rejects opaque token (must be JWT)")
+@pytest.mark.be
+async def test_protected_route_rejects_opaque_token(client, seed_data, password_session_via_login):
+    """Opaque password token must NOT be accepted on protected routes (JWT only)"""
+    res = await get(client, "/auth/me",
+        token=password_session_via_login["token"],
+        expected_status=401)
+    assert res.status_code == 401, "Protected route must reject opaque token"
+
+
+@allure.title("TC-API-AUTH-DS-07: Logout invalidates all password sessions")
+@pytest.mark.be
+async def test_logout_invalidates_all_password_sessions(client, seed_data, db_session, full_auth_via_api):
+    """After logout, password_sessions for user must all be is_active=False"""
+    from api.models.user import PasswordSession
+    password_token, access_jwt = full_auth_via_api
+
+    # Logout using access JWT
+    await post(client, "/auth/logout", token=access_jwt, expected_status=200)
+
+    # Assert: all password_sessions for owner are inactive
+    owner = seed_data["users"]["owner"]
+    active_sessions = db_session.query(PasswordSession).filter_by(
+        user_id=owner.id, is_active=True
+    ).all()
+    assert len(active_sessions) == 0, "All password_sessions must be inactive after logout"
+
+    # Assert: opaque token no longer works
+    res = await post(client, "/auth/pin/verify",
+        json={"pin": "123456"},
+        token=password_token,
+        expected_status=401)
+    assert res.status_code == 401, "Password session must be revoked after logout"
+
+
+@allure.title("TC-API-AUTH-DS-08: Password change invalidates all sessions")
+@pytest.mark.be
+@pytest.mark.isolated_last
+async def test_password_change_invalidates_all_sessions(client, seed_data, db_session, full_auth_via_api):
+    """After password change, all password_sessions and UserSessions must be revoked"""
+    from api.models.user import PasswordSession, UserSession
+    password_token, access_jwt = full_auth_via_api
+    owner = seed_data["users"]["owner"]
+
+    # Change password
+    await post(client, "/auth/password/change",
+        token=access_jwt,
+        json={"old_password": "test_pass", "new_password": "new_test_pass_123"},
+        expected_status=200)
+
+    # Assert: all password_sessions inactive
+    active_ps = db_session.query(PasswordSession).filter_by(user_id=owner.id, is_active=True).all()
+    assert len(active_ps) == 0, "All password_sessions must be revoked after password change"
+
+    # Assert: opaque token no longer works
+    res2 = await post(client, "/auth/pin/verify",
+        json={"pin": "123456"},
+        token=password_token,
+        expected_status=401)
+    assert res2.status_code == 401
+
+
+@allure.title("TC-API-AUTH-DS-09: Revoked password session returns 401 session_revoked")
+@pytest.mark.be
+async def test_revoked_password_session_returns_401(client, seed_data, db_session):
+    """Manually revoke a password session → pin/verify must return 401"""
+    from api.models.user import PasswordSession
+    import hashlib, secrets
+
+    # Create a revoked (is_active=False) password session
+    raw_token = secrets.token_urlsafe(32)
+    token_hash = hashlib.sha256(raw_token.encode()).hexdigest()
+    owner = seed_data["users"]["owner"]
+    revoked_session = PasswordSession(
+        user_id=owner.id,
+        token_hash=token_hash,
+        expires_at=datetime.utcnow() + timedelta(days=30),
+        is_active=False,  # revoked
+    )
+    db_session.add(revoked_session)
+    db_session.flush()
+
+    res = await post(client, "/auth/pin/verify",
+        json={"pin": "123456"},
+        token=raw_token,
+        expected_status=401)
+    assert res.status_code == 401
+
+
+@allure.title("TC-API-AUTH-DS-10: PIN verify with completely unknown token returns 401")
+@pytest.mark.be
+async def test_unknown_token_returns_401(client, seed_data):
+    """Completely unknown token must return 401 (not 500)"""
+    res = await post(client, "/auth/pin/verify",
+        json={"pin": "123456"},
+        token="totally_unknown_token_xyz123",
+        expected_status=401)
+    assert res.status_code == 401
