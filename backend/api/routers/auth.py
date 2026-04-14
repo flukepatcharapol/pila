@@ -23,8 +23,12 @@ from jose import JWTError
 
 from api.database import get_db
 from api.utils.auth import decode_jwt_token
-from api.dependencies.auth import require_pin_verified, get_developer_api_key, bearer_scheme
+from api.dependencies.auth import (
+    require_pin_verified, get_developer_api_key, bearer_scheme,
+    verify_password_session,
+)
 from api.services import auth as auth_service
+from api.models.user import PasswordSession
 from fastapi.security import HTTPAuthorizationCredentials
 
 router = APIRouter()
@@ -94,12 +98,12 @@ def login(body: LoginRequest, db: Session = Depends(get_db)):
 
 
 @router.post("/auth/pin/verify")
-def pin_verify(
+async def pin_verify(
     body: PinVerifyRequest,
-    payload: dict = Depends(_get_temp_token_payload),
+    password_session: PasswordSession = Depends(verify_password_session),
     db: Session = Depends(get_db),
 ):
-    return auth_service.verify_pin_and_issue_token(payload, body.pin, db)
+    return auth_service.verify_pin_and_issue_token(password_session, body.pin, db)
 
 
 @router.post("/auth/pin/forgot")

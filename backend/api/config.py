@@ -18,7 +18,13 @@ class Settings(BaseSettings):
     # Security
     SECRET_KEY: str = "changeme"
     ALGORITHM: str = "HS256"
+    # ACCESS_TOKEN_EXPIRE_MINUTES is kept for backward compatibility but superseded
+    # by PIN_ACCESS_TOKEN_EXPIRE_MINUTES for the PIN verify flow.
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 480
+
+    # Dual-session settings (Approach B)
+    PASSWORD_SESSION_DAYS: int = 30           # lifetime of opaque password session
+    PIN_ACCESS_TOKEN_EXPIRE_MINUTES: int = 360  # 6-hour access JWT after PIN verify
 
     # Developer internal API
     DEVELOPER_API_KEY: str = "dev_api_key_12345"

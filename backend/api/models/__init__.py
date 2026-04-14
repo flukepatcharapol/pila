@@ -9,6 +9,7 @@ from api.models.branch import Branch
 from api.models.user import (
     User, SourceType, UserRole,
     LoginAttempt, PinAttempt, PinOtp, PasswordResetToken, UserSession,
+    PasswordSession,
 )
 from api.models.customer import Customer, CustomerHourBalance, CustomerCodeCounter
 from api.models.customer_hour import CustomerHourLog
@@ -31,6 +32,7 @@ __all__ = [
     "PinOtp",
     "PasswordResetToken",
     "UserSession",
+    "PasswordSession",
     "Customer",
     "CustomerHourBalance",
     "CustomerCodeCounter",

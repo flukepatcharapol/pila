@@ -27,6 +27,7 @@ from api.database import Base
 from api.models import (
     Partner, Branch,
     User, SourceType, UserRole, LoginAttempt, PinAttempt, PinOtp, PasswordResetToken, UserSession,
+    PasswordSession,
     Customer, CustomerHourBalance, CustomerCodeCounter, CustomerHourLog,
     Trainer, Caretaker,
     Package, PackageBranchScope,
