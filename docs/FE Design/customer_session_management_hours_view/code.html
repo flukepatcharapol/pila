@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Customer Session Management | The Mindful Curator</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#e1e3e4",
+                        "surface-container": "#eceeef",
+                        "on-secondary-fixed": "#001c3b",
+                        "surface-variant": "#e1e3e4",
+                        "secondary-fixed": "#d5e3ff",
+                        "on-surface-variant": "#43474c",
+                        "primary-container": "#2c3e50",
+                        "on-background": "#191c1d",
+                        "inverse-on-surface": "#eff1f2",
+                        "primary": "#162839",
+                        "on-tertiary-fixed-variant": "#004f4f",
+                        "surface-container-high": "#e6e8e9",
+                        "tertiary-fixed-dim": "#76d6d5",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#191c1d",
+                        "on-primary-container": "#96a9be",
+                        "surface-dim": "#d8dadb",
+                        "primary-fixed-dim": "#b5c8df",
+                        "inverse-surface": "#2e3132",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#004444",
+                        "on-tertiary-container": "#54b6b5",
+                        "secondary-container": "#9ec2fe",
+                        "inverse-primary": "#b5c8df",
+                        "surface-tint": "#4e6073",
+                        "error-container": "#ffdad6",
+                        "outline-variant": "#c4c6cd",
+                        "tertiary-fixed": "#93f2f2",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#002020",
+                        "tertiary": "#002c2c",
+                        "on-secondary-container": "#284f83",
+                        "on-secondary-fixed-variant": "#1e477b",
+                        "primary-fixed": "#d1e4fb",
+                        "surface-bright": "#f8fafb",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#36485b",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed": "#091d2e",
+                        "error": "#ba1a1a",
+                        "background": "#f8fafb",
+                        "surface-container-low": "#f2f4f5",
+                        "surface": "#f8fafb",
+                        "secondary-fixed-dim": "#a7c8ff",
+                        "outline": "#74777d",
+                        "secondary": "#395f94",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface-container-low text-on-surface">
+<!-- SideNavBar -->
+<aside class="h-screen w-72 fixed left-0 top-0 overflow-y-auto bg-[#f2f4f5] dark:bg-[#162839] flex flex-col p-6 gap-y-4 z-40">
+<div class="mb-6">
+<h1 class="font-['Manrope'] font-black text-xl text-[#162839] dark:text-[#f8fafb]">The Mindful Curator</h1>
+<p class="text-xs text-secondary font-medium tracking-wide">Studio Command Center</p>
+</div>
+<button class="w-full bg-primary text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 mb-4 hover:translate-x-1 transition-all duration-200 active:scale-98">
+<span class="material-symbols-outlined text-sm">add</span>
+            New Booking
+        </button>
+<nav class="flex flex-col gap-y-1">
+<!-- Dashboard -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#395f94] dark:text-[#e6e8e9] hover:bg-[#e6e8e9] dark:hover:bg-[#395f94]/20 hover:translate-x-1 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-medium text-sm">Dashboard</span>
+</a>
+<!-- Customer Session (Active) -->
+<a class="flex items-center gap-3 px-4 py-3 bg-white dark:bg-[#395f94] text-[#162839] dark:text-white rounded-lg shadow-sm font-bold active:scale-98 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="event_repeat">event_repeat</span>
+<span class="font-medium text-sm">Customer Session</span>
+</a>
+<!-- Booking -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#395f94] dark:text-[#e6e8e9] hover:bg-[#e6e8e9] dark:hover:bg-[#395f94]/20 hover:translate-x-1 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-medium text-sm">Booking</span>
+</a>
+<!-- Customer -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#395f94] dark:text-[#e6e8e9] hover:bg-[#e6e8e9] dark:hover:bg-[#395f94]/20 hover:translate-x-1 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-medium text-sm">Customer</span>
+</a>
+<!-- Order -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#395f94] dark:text-[#e6e8e9] hover:bg-[#e6e8e9] dark:hover:bg-[#395f94]/20 hover:translate-x-1 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="shopping_bag">shopping_bag</span>
+<span class="font-medium text-sm">Order</span>
+</a>
+<!-- Signature Print -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#395f94] dark:text-[#e6e8e9] hover:bg-[#e6e8e9] dark:hover:bg-[#395f94]/20 hover:translate-x-1 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="draw">draw</span>
+<span class="font-medium text-sm">Signature Print</span>
+</a>
+<!-- Trainer -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#395f94] dark:text-[#e6e8e9] hover:bg-[#e6e8e9] dark:hover:bg-[#395f94]/20 hover:translate-x-1 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="person_pin">person_pin</span>
+<span class="font-medium text-sm">Trainer</span>
+</a>
+<!-- Consultant -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#395f94] dark:text-[#e6e8e9] hover:bg-[#e6e8e9] dark:hover:bg-[#395f94]/20 hover:translate-x-1 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
+<span class="font-medium text-sm">Consultant</span>
+</a>
+<!-- Package -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#395f94] dark:text-[#e6e8e9] hover:bg-[#e6e8e9] dark:hover:bg-[#395f94]/20 hover:translate-x-1 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-medium text-sm">Package</span>
+</a>
+<!-- User -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#395f94] dark:text-[#e6e8e9] hover:bg-[#e6e8e9] dark:hover:bg-[#395f94]/20 hover:translate-x-1 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="contact_page">contact_page</span>
+<span class="font-medium text-sm">User</span>
+</a>
+<!-- Branch -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#395f94] dark:text-[#e6e8e9] hover:bg-[#e6e8e9] dark:hover:bg-[#395f94]/20 hover:translate-x-1 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="storefront">storefront</span>
+<span class="font-medium text-sm">Branch</span>
+</a>
+<!-- Permission -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#395f94] dark:text-[#e6e8e9] hover:bg-[#e6e8e9] dark:hover:bg-[#395f94]/20 hover:translate-x-1 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="key">key</span>
+<span class="font-medium text-sm">Permission</span>
+</a>
+<!-- Setting -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#395f94] dark:text-[#e6e8e9] hover:bg-[#e6e8e9] dark:hover:bg-[#395f94]/20 hover:translate-x-1 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-medium text-sm">Setting</span>
+</a>
+<!-- Help -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#395f94] dark:text-[#e6e8e9] hover:bg-[#e6e8e9] dark:hover:bg-[#395f94]/20 hover:translate-x-1 transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-medium text-sm">Help</span>
+</a>
+</nav>
+<!-- User Profile Anchor -->
+<div class="mt-auto pt-6 flex items-center gap-3">
+<img alt="Studio Owner Profile" class="w-10 h-10 rounded-full object-cover" data-alt="portrait of a professional studio owner in a clean modern environment with soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnKtBeLuHgOt1kGXikehs8W6EwwA4JrWCarN4weXj5hBi7B0MjfxZNaMkcgq5juj5lor7szPkSkCTwfQUupT5Lc5YQlF6JTW362KdwaSoK3CCzJGurCtt9f_qoPAy-aQs98HrLuJTibwHBhkNr1A7NyGjzDLCFHjEMZ2U8VEAoEl-a_4S6bEcZvEQrBJDFC5jzDC7peu_5JLs7cP5nS-Vsy9sf7cYS2_M6UZoF3z7P7AlsGRP1gRLqTCkBpK-HPiOF5OYgWSJ5Pg"/>
+<div>
+<p class="text-sm font-bold text-primary">Alex Mercer</p>
+<p class="text-xs text-outline">Studio Owner</p>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-72 min-h-screen">
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 left-72 bg-[#f8fafb]/80 backdrop-blur-xl z-30 shadow-sm flex justify-between items-center px-8 h-20 transition-all">
+<div class="flex items-center gap-8">
+<h2 class="text-2xl font-extrabold text-[#162839] tracking-tight">Customer Session Management</h2>
+<nav class="hidden md:flex gap-6">
+<a class="text-[#54b6b5] font-bold border-b-2 border-[#54b6b5] py-2 h-20 flex items-center" href="#">Main Branch</a>
+<a class="text-[#395f94] hover:text-[#54b6b5] transition-colors duration-300 py-2 h-20 flex items-center" href="#">Downtown Studio</a>
+<a class="text-[#395f94] hover:text-[#54b6b5] transition-colors duration-300 py-2 h-20 flex items-center" href="#">Westside Hub</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-primary hover:bg-surface-container transition-colors rounded-full">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-primary hover:bg-surface-container transition-colors rounded-full">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Page Content -->
+<section class="pt-28 px-10 pb-10">
+<!-- Filter Bar -->
+<div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-8">
+<div class="flex-1 w-full md:max-w-xl">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors" data-icon="search">search</span>
+<input class="w-full bg-surface-container-lowest border-none rounded-xl py-4 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-primary-fixed-dim transition-all" placeholder="Search by customer name or code..." type="text"/>
+</div>
+</div>
+<div class="flex gap-4 items-center">
+<div class="flex bg-surface-container-high p-1 rounded-xl">
+<button class="px-4 py-2 bg-white text-primary font-bold rounded-lg shadow-sm text-sm">All Branches</button>
+<button class="px-4 py-2 text-outline hover:text-primary text-sm transition-colors">Main</button>
+<button class="px-4 py-2 text-outline hover:text-primary text-sm transition-colors">Downtown</button>
+</div>
+<button class="p-4 bg-surface-container-highest text-primary rounded-xl flex items-center gap-2 hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined" data-icon="tune">tune</span>
+<span class="text-sm font-bold">Filters</span>
+</button>
+</div>
+</div>
+<!-- Session Data Table -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden border border-white/40">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant text-[11px] uppercase tracking-widest font-bold border-b border-surface-container">
+<th class="px-8 py-5">Customer</th>
+<th class="px-6 py-5">Code</th>
+<th class="px-6 py-5 text-center">Total Purchased</th>
+<th class="px-6 py-5 text-center">Used</th>
+<th class="px-6 py-5 text-center">Remaining</th>
+<th class="px-6 py-5">Last Session</th>
+<th class="px-6 py-5">Status</th>
+<th class="px-8 py-5 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container/30">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<img alt="Sarah Jenkins" class="w-12 h-12 rounded-full object-cover shadow-sm" data-alt="portrait of a focused athletic woman in a pilates studio with soft morning light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTZCWROnwf_Len3ECO5ytEtXfbRBtdA59FpfnhPti11RgpMXv8R1aHuXhUM6iMmYUa5Qc3PVL3yLYf0fcDE4DU_afdyXdteqahr0MlxePYouXRO5LZdXnWpu1a83-IvyUOhiBVo3jowZg0Do09wFiKrR3CrbCnk6-lxN8p8hRQp0KN3MnVTN-in4rkULDtmAolTe3FJT9X0jMyDysVMEVP05hqCeeEKsx5N-Z49ZenrBEvdtOLfyiEeN8WYBXqwsS0zX4dYOvFTQ"/>
+<div>
+<div class="text-sm font-bold text-primary group-hover:text-secondary transition-colors">Sarah Jenkins</div>
+<div class="text-xs text-outline">Reformer Pilates</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-6 text-sm font-mono text-outline">BPY-MKT001</td>
+<td class="px-6 py-6 text-center text-sm font-medium">40.0 h</td>
+<td class="px-6 py-6 text-center text-sm font-medium">12.5 h</td>
+<td class="px-6 py-6 text-center">
+<span class="inline-block px-4 py-2 bg-tertiary-fixed text-on-tertiary-fixed font-bold text-sm rounded-lg shadow-sm">27.5 h</span>
+</td>
+<td class="px-6 py-6 text-sm text-outline">Oct 24, 2023</td>
+<td class="px-6 py-6">
+<span class="flex items-center gap-1.5 text-xs font-bold text-[#54b6b5]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#54b6b5]"></span>
+                                    Active
+                                </span>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="px-4 py-2 text-xs font-bold text-primary border border-primary/10 rounded-lg hover:bg-primary hover:text-white transition-all active:scale-95">View History</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<img alt="David Miller" class="w-12 h-12 rounded-full object-cover shadow-sm" data-alt="portrait of a healthy middle aged man smiling in a professional wellness center setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDep-WXuqs7vIcGX2gaC0M8SiLUGuBZU6dKJ-xPEtKVYLK-ULC0YxtoAh5YnJ3UagYqzFlo57HPaXjSE_fUgGkjmwF33eT9E37uWf5oTXgIh5Qu2nJh16IyEzj0bPnvku51mUx-axbt4IgtZUBi3PXWUxvyQ_oW4SlSIkoawD0UXj_xDpE1zK4ItQdHug0sPL0zVraW_TLF7Z-6V9gFJfwT4_y-X1Nehbwu-HPBbO1f9HeX6VPauAFRWtddd62Ho15s10OqPXpsjQ"/>
+<div>
+<div class="text-sm font-bold text-primary group-hover:text-secondary transition-colors">David Miller</div>
+<div class="text-xs text-outline">Private Coaching</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-6 text-sm font-mono text-outline">BPY-MKT042</td>
+<td class="px-6 py-6 text-center text-sm font-medium">20.0 h</td>
+<td class="px-6 py-6 text-center text-sm font-medium">18.0 h</td>
+<td class="px-6 py-6 text-center">
+<span class="inline-block px-4 py-2 bg-error-container text-on-error-container font-bold text-sm rounded-lg shadow-sm">2.0 h</span>
+</td>
+<td class="px-6 py-6 text-sm text-outline">Oct 21, 2023</td>
+<td class="px-6 py-6">
+<span class="flex items-center gap-1.5 text-xs font-bold text-error">
+<span class="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></span>
+                                    Expiring Soon
+                                </span>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="px-4 py-2 text-xs font-bold text-primary border border-primary/10 rounded-lg hover:bg-primary hover:text-white transition-all active:scale-95">View History</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<img alt="Elena Rodriguez" class="w-12 h-12 rounded-full object-cover shadow-sm" data-alt="portrait of a young professional woman smiling in a bright modern office with plants" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDigBBJmx3yS1-vF8fImhBwdKlrYafL2AEF-rCeoe0kRF4oAPdCgaI6EDOavmozVnI4-hjF88Mpz6cqASIUTc0yhom_LNgsByynjMHV-fMZmeo9BWY_KHvl2yN9UJfFy8k40XpPxACpCFoV9rlgrygXbafn3beRVWbUn-CbvS92j2g674hk7O6PLwEhJPo6Z4ci324rzdptQq4imNZrOnX-nZxmsfhdsJmBBuNKfu1Pax2Yuhe6kzZqIqHnU47Afv50lELTrkYeDg"/>
+<div>
+<div class="text-sm font-bold text-primary group-hover:text-secondary transition-colors">Elena Rodriguez</div>
+<div class="text-xs text-outline">Mat Work Group</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-6 text-sm font-mono text-outline">BPY-MKT089</td>
+<td class="px-6 py-6 text-center text-sm font-medium">10.0 h</td>
+<td class="px-6 py-6 text-center text-sm font-medium">0.0 h</td>
+<td class="px-6 py-6 text-center">
+<span class="inline-block px-4 py-2 bg-primary-fixed text-on-primary-fixed font-bold text-sm rounded-lg shadow-sm">10.0 h</span>
+</td>
+<td class="px-6 py-6 text-sm text-outline">New Customer</td>
+<td class="px-6 py-6">
+<span class="flex items-center gap-1.5 text-xs font-bold text-[#54b6b5]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#54b6b5]"></span>
+                                    Active
+                                </span>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="px-4 py-2 text-xs font-bold text-primary border border-primary/10 rounded-lg hover:bg-primary hover:text-white transition-all active:scale-95">View History</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<img alt="Jordan Smith" class="w-12 h-12 rounded-full object-cover shadow-sm" data-alt="portrait of a confident woman in studio attire looking directly at camera with neutral expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjTfa2OqO_LaAE4SBKMlki9YEpI7r2QorJiE8sCGbsrAF_DGqZgjTGO1cnwnEV68tH1x9WbrX1DmnfXOx9azYmQN-5_ISP7qgBLXyE2x0NJX_wiinY5Pslo-tiu2blTjJdyR5OP3Yq-VFjJSbq7JRQws3gw5wKi4S9_hCiRYjOlg3GNNm8n7Zs3oolTUSmEuBXjbMd6B_N3RiyKGbO9aeHRb4HGXmaAo3sV_lkY5mHfaILyL4OLKJ4HkJjaAJuB8sxTz3Glpw1sw"/>
+<div>
+<div class="text-sm font-bold text-primary group-hover:text-secondary transition-colors">Jordan Smith</div>
+<div class="text-xs text-outline">Elite Reformer</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-6 text-sm font-mono text-outline">BPY-MKT102</td>
+<td class="px-6 py-6 text-center text-sm font-medium">50.0 h</td>
+<td class="px-6 py-6 text-center text-sm font-medium">50.0 h</td>
+<td class="px-6 py-6 text-center">
+<span class="inline-block px-4 py-2 bg-surface-container-highest text-outline font-bold text-sm rounded-lg">0.0 h</span>
+</td>
+<td class="px-6 py-6 text-sm text-outline">Oct 15, 2023</td>
+<td class="px-6 py-6">
+<span class="flex items-center gap-1.5 text-xs font-bold text-outline">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                                    Inactive
+                                </span>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="px-4 py-2 text-xs font-bold text-primary border border-primary/10 rounded-lg hover:bg-primary hover:text-white transition-all active:scale-95">View History</button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<img alt="Marcus Chen" class="w-12 h-12 rounded-full object-cover shadow-sm" data-alt="cheerful young man with short hair wearing casual clothing in a brightly lit studio environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASf341CKNc94xkOYeQh5IlaKQ1DhN34l9Lpdwq3JigVDUw2tgxCNclgbCgXatEDT0GpCSlUPDeSftTqPUbxBuMSCRFusAfCw268tvfSBKd04JgNE1Qi0_CXEl8wXuUMkt9Zb-Jfx_nq5XCxek58Bsnv4nSussG7NsIknuS2iKLklysLKboYEf4EhFrOxLGjSfhcj0Y4FHi6tKOyvfBFRxqABhrt9gVi9P8BvrJvftHbnaglmqgLE-CKo_9YbiEe3Y6vgIJ29jerQ"/>
+<div>
+<div class="text-sm font-bold text-primary group-hover:text-secondary transition-colors">Marcus Chen</div>
+<div class="text-xs text-outline">Beginner Mat</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-6 text-sm font-mono text-outline">BPY-MKT115</td>
+<td class="px-6 py-6 text-center text-sm font-medium">15.0 h</td>
+<td class="px-6 py-6 text-center text-sm font-medium">3.0 h</td>
+<td class="px-6 py-6 text-center">
+<span class="inline-block px-4 py-2 bg-tertiary-fixed text-on-tertiary-fixed font-bold text-sm rounded-lg shadow-sm">12.0 h</span>
+</td>
+<td class="px-6 py-6 text-sm text-outline">Oct 23, 2023</td>
+<td class="px-6 py-6">
+<span class="flex items-center gap-1.5 text-xs font-bold text-[#54b6b5]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#54b6b5]"></span>
+                                    Active
+                                </span>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="px-4 py-2 text-xs font-bold text-primary border border-primary/10 rounded-lg hover:bg-primary hover:text-white transition-all active:scale-95">View History</button>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- Pagination Footer -->
+<div class="px-8 py-6 bg-surface-container-low/50 flex items-center justify-between">
+<p class="text-xs text-outline font-medium">Showing 1 to 5 of 124 customers</p>
+<div class="flex gap-2">
+<button class="p-2 bg-white text-primary rounded-lg border border-primary/5 hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center bg-primary text-white rounded-lg text-xs font-bold">1</button>
+<button class="w-8 h-8 flex items-center justify-center bg-white text-primary rounded-lg text-xs font-bold hover:bg-surface-container transition-all">2</button>
+<button class="w-8 h-8 flex items-center justify-center bg-white text-primary rounded-lg text-xs font-bold hover:bg-surface-container transition-all">3</button>
+<button class="p-2 bg-white text-primary rounded-lg border border-primary/5 hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Dashboard Stats Summary -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+<div class="bg-surface-container-highest p-8 rounded-xl flex flex-col gap-2">
+<span class="text-xs font-bold text-outline uppercase tracking-widest">Total Remaining Hours</span>
+<div class="text-3xl font-black text-primary">1,482.5 <span class="text-sm font-medium">hrs</span></div>
+<div class="mt-4 flex items-center gap-2 text-xs font-medium text-[#54b6b5]">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+                        +12% from last month
+                    </div>
+</div>
+<div class="bg-white p-8 rounded-xl flex flex-col gap-2 shadow-sm border border-primary/5">
+<span class="text-xs font-bold text-outline uppercase tracking-widest">Active Credits</span>
+<div class="text-3xl font-black text-primary">89 <span class="text-sm font-medium">users</span></div>
+<div class="mt-4 flex items-center gap-2 text-xs font-medium text-secondary">
+<span class="material-symbols-outlined text-sm">group</span>
+                        9 new packages this week
+                    </div>
+</div>
+<div class="bg-[#162839] p-8 rounded-xl flex flex-col gap-2">
+<span class="text-xs font-bold text-tertiary-fixed uppercase tracking-widest">Revenue Forecast</span>
+<div class="text-3xl font-black text-white">$12,450 <span class="text-sm font-medium text-white/50">USD</span></div>
+<div class="mt-4 flex items-center gap-2 text-xs font-medium text-tertiary-fixed-dim">
+<span class="material-symbols-outlined text-sm">payments</span>
+                        Projected renewal value
+                    </div>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB -->
+<button class="fixed bottom-10 right-10 w-16 h-16 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</body></html>

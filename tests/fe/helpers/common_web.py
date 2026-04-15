@@ -114,7 +114,16 @@ def _get_locator(page: Page, testid: str, xpath: str, request=None):
     2. ถ้าไม่พบ + STRICT_LOCATOR=true → raise Exception
     3. ถ้าไม่พบ + STRICT_LOCATOR=false → ใช้ XPath fallback
     """
-    primary = page.get_by_test_id(testid)
+    alias_map = {
+        # Backward-compatible aliases used by existing tests
+        "logout-btn": "sidebar-logout-btn",
+        "save-btn": "settings-save-btn",
+        "confirm-btn": "confirm-dialog-confirm-btn",
+        "add-btn": "customer-list-add-btn",
+        "table-search": "customer-list-search",
+    }
+    canonical_testid = alias_map.get(testid, testid)
+    primary = page.get_by_test_id(canonical_testid)
 
     if primary.count() > 0:
         # พบ element ด้วย data-testid → ใช้ primary
@@ -122,7 +131,7 @@ def _get_locator(page: Page, testid: str, xpath: str, request=None):
 
     if STRICT_LOCATOR:
         raise Exception(
-            f"[STRICT] data-testid='{testid}' not found. "
+            f"[STRICT] data-testid='{canonical_testid}' not found. "
             "In strict mode, all elements must have data-testid attributes."
         )
 
@@ -130,11 +139,11 @@ def _get_locator(page: Page, testid: str, xpath: str, request=None):
     if request and hasattr(request, "node"):
         if not hasattr(request.node, "fallback_used"):
             request.node.fallback_used = []
-        request.node.fallback_used.append(testid)
+        request.node.fallback_used.append(canonical_testid)
 
     # Log fallback เข้า Allure
     allure.attach(
-        body=f"data-testid='{testid}' not found → using XPath: {xpath}",
+        body=f"data-testid='{canonical_testid}' not found → using XPath: {xpath}",
         name="⚠️ Fallback to XPath",
         attachment_type=allure.attachment_type.TEXT,
     )
@@ -249,6 +258,8 @@ def get_table_row_count(page: Page) -> int:
     """นับจำนวน rows ใน data table"""
     with allure.step("Count table rows"):
         rows = page.locator("[data-testid='table-row']")
+        if rows.count() == 0:
+            rows = page.locator("table tbody tr")
         return rows.count()
 
 
@@ -256,6 +267,8 @@ def assert_table_contains(page: Page, text: str) -> None:
     """ตรวจสอบว่า table มี row ที่มี text ที่กำหนด"""
     with allure.step(f"Assert table contains: '{text}'"):
         row = page.locator(f"[data-testid='table-row']:has-text('{text}')")
+        if row.count() == 0:
+            row = page.locator(f"table tbody tr:has-text('{text}')")
         assert row.count() > 0, (
             f"Table should contain a row with text '{text}' but none found."
         )
@@ -265,6 +278,8 @@ def assert_table_not_contains(page: Page, text: str) -> None:
     """ตรวจสอบว่า table ไม่มี row ที่มี text ที่กำหนด"""
     with allure.step(f"Assert table NOT contains: '{text}'"):
         row = page.locator(f"[data-testid='table-row']:has-text('{text}')")
+        if row.count() == 0:
+            row = page.locator(f"table tbody tr:has-text('{text}')")
         assert row.count() == 0, (
             f"Table should NOT contain a row with text '{text}' but found {row.count()}."
         )
@@ -277,11 +292,26 @@ def assert_no_uuid_in_table(page: Page) -> None:
     """
     with allure.step("Assert no raw UUIDs in table"):
         cells = page.locator("[data-testid='table-cell']").all_text_contents()
+        if not cells:
+            cells = page.locator("table tbody td").all_text_contents()
         for text in cells:
             assert not UUID_PATTERN.search(text), (
                 f"Found raw UUID in table cell: '{text}'. "
                 "Table must show human-readable values, not UUIDs."
             )
+
+
+def assert_no_uuid_in_page(page: Page) -> None:
+    """
+    ตรวจสอบทั้งหน้า web ว่าไม่มี raw UUID โผล่ในข้อความที่มองเห็น
+    ใช้สำหรับ TC-CROSS-05 และ regression checks ในหลาย module
+    """
+    with allure.step("Assert no raw UUIDs in visible page text"):
+        content = page.locator("body").inner_text()
+        assert not UUID_PATTERN.search(content), (
+            "Found raw UUID text visible in UI. "
+            "UI must render human-readable names/codes instead of UUIDs."
+        )
 
 
 # ─── Form Helpers ────────────────────────────────────────────────────────────────
@@ -550,6 +580,8 @@ def assert_sidebar_item_visible(page: Page, item_text: str) -> None:
     """ตรวจสอบว่า sidebar menu item มองเห็นอยู่"""
     with allure.step(f"Assert sidebar item visible: '{item_text}'"):
         item = page.locator(f"[data-testid='sidebar-item']:has-text('{item_text}')")
+        if item.count() == 0:
+            item = page.locator(f"aside a:has-text('{item_text}')")
         assert item.is_visible(), (
             f"Sidebar item '{item_text}' should be visible for this role "
             "but it is hidden or not rendered."
@@ -560,7 +592,9 @@ def assert_sidebar_item_hidden(page: Page, item_text: str) -> None:
     """ตรวจสอบว่า sidebar menu item ถูกซ่อนอยู่"""
     with allure.step(f"Assert sidebar item hidden: '{item_text}'"):
         item = page.locator(f"[data-testid='sidebar-item']:has-text('{item_text}')")
-        assert not item.is_visible(), (
+        if item.count() == 0:
+            item = page.locator(f"aside a:has-text('{item_text}')")
+        assert item.count() == 0 or not item.first.is_visible(), (
             f"Sidebar item '{item_text}' should be hidden for this role "
             "but it is visible — permission is not applied correctly."
         )
@@ -577,3 +611,33 @@ def assert_feature_disabled_overlay(page: Page) -> None:
         assert "ฟีเจอร์นี้ไม่พร้อมใช้งาน" in (overlay.text_content() or ""), (
             "Feature disabled overlay must contain Thai text 'ฟีเจอร์นี้ไม่พร้อมใช้งาน'."
         )
+
+
+def assert_sidebar_has_labels(page: Page, expected_labels: list[str]) -> None:
+    """ตรวจสอบว่า sidebar มีเมนูตาม labels ที่คาดหวัง"""
+    with allure.step("Assert sidebar includes expected labels"):
+        for label in expected_labels:
+            assert_sidebar_item_visible(page, label)
+
+
+def assert_sidebar_lacks_labels(page: Page, hidden_labels: list[str]) -> None:
+    """ตรวจสอบว่า sidebar ไม่มีเมนูตาม labels ที่ไม่ควรมองเห็น"""
+    with allure.step("Assert sidebar excludes restricted labels"):
+        for label in hidden_labels:
+            assert_sidebar_item_hidden(page, label)
+
+
+def set_tablet_viewport(page: Page) -> None:
+    """ตั้ง viewport ขนาด tablet สำหรับ responsive checks"""
+    with allure.step("Set viewport to tablet (768x1024)"):
+        page.set_viewport_size({"width": 768, "height": 1024})
+
+
+def ensure_route_access(page: Page, role: str, route: str, request=None) -> None:
+    """
+    Login ตาม role แล้ว navigate ไป route ที่ต้องการ
+    ใช้เป็น helper พื้นฐานใน testcase ใหม่หลาย module
+    """
+    with allure.step(f"Ensure route access: role={role}, route={route}"):
+        login_as(page, role=role, request=request)
+        navigate(page, route)

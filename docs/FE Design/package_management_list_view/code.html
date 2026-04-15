@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Package Management | The Mindful Curator</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-high": "#e6e8e9",
+                      "outline-variant": "#c4c6cd",
+                      "primary-container": "#2c3e50",
+                      "on-surface": "#191c1d",
+                      "on-error-container": "#93000a",
+                      "on-primary": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container-low": "#f2f4f5",
+                      "primary-fixed": "#d1e4fb",
+                      "inverse-primary": "#b5c8df",
+                      "error": "#ba1a1a",
+                      "tertiary-fixed-dim": "#76d6d5",
+                      "secondary-fixed": "#d5e3ff",
+                      "on-tertiary-fixed-variant": "#004f4f",
+                      "on-tertiary-fixed": "#002020",
+                      "tertiary": "#002c2c",
+                      "on-secondary-container": "#284f83",
+                      "surface-tint": "#4e6073",
+                      "secondary-container": "#9ec2fe",
+                      "inverse-on-surface": "#eff1f2",
+                      "background": "#f8fafb",
+                      "on-secondary-fixed": "#001c3b",
+                      "tertiary-fixed": "#93f2f2",
+                      "outline": "#74777d",
+                      "tertiary-container": "#004444",
+                      "primary-fixed-dim": "#b5c8df",
+                      "on-primary-fixed-variant": "#36485b",
+                      "error-container": "#ffdad6",
+                      "on-tertiary-container": "#54b6b5",
+                      "surface": "#f8fafb",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "surface-dim": "#d8dadb",
+                      "surface-container-highest": "#e1e3e4",
+                      "on-surface-variant": "#43474c",
+                      "inverse-surface": "#2e3132",
+                      "primary": "#162839",
+                      "on-primary-fixed": "#091d2e",
+                      "surface-variant": "#e1e3e4",
+                      "secondary-fixed-dim": "#a7c8ff",
+                      "on-error": "#ffffff",
+                      "on-secondary-fixed-variant": "#1e477b",
+                      "surface-bright": "#f8fafb",
+                      "on-primary-container": "#96a9be",
+                      "surface-container": "#eceeef",
+                      "secondary": "#395f94",
+                      "on-background": "#191c1d"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "fontFamily": {
+                      "headline": ["Manrope"],
+                      "body": ["Inter"],
+                      "label": ["Inter"]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-side-nav-active {
+            background-color: white;
+            color: #162839;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            font-weight: 700;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .premium-shadow {
+            box-shadow: 0px 20px 40px rgba(25, 28, 29, 0.06);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body min-h-screen">
+<!-- SideNavBar Shell -->
+<aside class="h-screen w-72 fixed left-0 top-0 bg-[#f2f4f5] dark:bg-[#162839] flex flex-col p-6 gap-y-2 z-50 overflow-y-auto no-scrollbar hidden md:flex">
+<div class="flex items-center gap-3 mb-8 px-2">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">spa</span>
+</div>
+<div>
+<h2 class="font-manrope font-extrabold text-[#162839] dark:text-white leading-tight">The Mindful Curator</h2>
+<p class="text-[10px] uppercase tracking-widest text-[#395f94] dark:text-[#f2f4f5]/60">Studio Management</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-y-1">
+<a class="flex items-center gap-3 px-4 py-2.5 text-[#395f94] dark:text-[#f2f4f5]/60 hover:text-[#162839] hover:bg-white/50 dark:hover:bg-[#395f94]/40 hover:translate-x-1 transition-all duration-300 rounded-lg cursor-pointer" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-inter text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-[#395f94] dark:text-[#f2f4f5]/60 hover:text-[#162839] hover:bg-white/50 dark:hover:bg-[#395f94]/40 hover:translate-x-1 transition-all duration-300 rounded-lg cursor-pointer" href="#">
+<span class="material-symbols-outlined">event_repeat</span>
+<span class="font-inter text-sm font-medium">Customer Session</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-[#395f94] dark:text-[#f2f4f5]/60 hover:text-[#162839] hover:bg-white/50 dark:hover:bg-[#395f94]/40 hover:translate-x-1 transition-all duration-300 rounded-lg cursor-pointer" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-inter text-sm font-medium">Booking</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-[#395f94] dark:text-[#f2f4f5]/60 hover:text-[#162839] hover:bg-white/50 dark:hover:bg-[#395f94]/40 hover:translate-x-1 transition-all duration-300 rounded-lg cursor-pointer" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-inter text-sm font-medium">Customer</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-[#395f94] dark:text-[#f2f4f5]/60 hover:text-[#162839] hover:bg-white/50 dark:hover:bg-[#395f94]/40 hover:translate-x-1 transition-all duration-300 rounded-lg cursor-pointer" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-inter text-sm font-medium">Order</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-[#395f94] dark:text-[#f2f4f5]/60 hover:text-[#162839] hover:bg-white/50 dark:hover:bg-[#395f94]/40 hover:translate-x-1 transition-all duration-300 rounded-lg cursor-pointer" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-inter text-sm font-medium">Signature Print</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-[#395f94] dark:text-[#f2f4f5]/60 hover:text-[#162839] hover:bg-white/50 dark:hover:bg-[#395f94]/40 hover:translate-x-1 transition-all duration-300 rounded-lg cursor-pointer" href="#">
+<span class="material-symbols-outlined">person_pin</span>
+<span class="font-inter text-sm font-medium">Trainer</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-[#395f94] dark:text-[#f2f4f5]/60 hover:text-[#162839] hover:bg-white/50 dark:hover:bg-[#395f94]/40 hover:translate-x-1 transition-all duration-300 rounded-lg cursor-pointer" href="#">
+<span class="material-symbols-outlined">psychology</span>
+<span class="font-inter text-sm font-medium">Consultant</span>
+</a>
+<!-- ACTIVE TAB: Package -->
+<a class="flex items-center gap-3 px-4 py-2.5 custom-side-nav-active rounded-lg transition-all duration-300 cursor-pointer" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="font-inter text-sm">Package</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-[#395f94] dark:text-[#f2f4f5]/60 hover:text-[#162839] hover:bg-white/50 dark:hover:bg-[#395f94]/40 hover:translate-x-1 transition-all duration-300 rounded-lg cursor-pointer" href="#">
+<span class="material-symbols-outlined">assignment_ind</span>
+<span class="font-inter text-sm font-medium">User</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-[#395f94] dark:text-[#f2f4f5]/60 hover:text-[#162839] hover:bg-white/50 dark:hover:bg-[#395f94]/40 hover:translate-x-1 transition-all duration-300 rounded-lg cursor-pointer" href="#">
+<span class="material-symbols-outlined">storefront</span>
+<span class="font-inter text-sm font-medium">Branch</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-[#395f94] dark:text-[#f2f4f5]/60 hover:text-[#162839] hover:bg-white/50 dark:hover:bg-[#395f94]/40 hover:translate-x-1 transition-all duration-300 rounded-lg cursor-pointer" href="#">
+<span class="material-symbols-outlined">verified_user</span>
+<span class="font-inter text-sm font-medium">Permission</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-[#395f94] dark:text-[#f2f4f5]/60 hover:text-[#162839] hover:bg-white/50 dark:hover:bg-[#395f94]/40 hover:translate-x-1 transition-all duration-300 rounded-lg cursor-pointer" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-inter text-sm font-medium">Setting</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-[#395f94] dark:text-[#f2f4f5]/60 hover:text-[#162839] hover:bg-white/50 dark:hover:bg-[#395f94]/40 hover:translate-x-1 transition-all duration-300 rounded-lg cursor-pointer" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-inter text-sm font-medium">Help</span>
+</a>
+</nav>
+<div class="pt-6 mt-auto flex flex-col gap-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-[#395f94] dark:text-[#f2f4f5]/60 hover:translate-x-1 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-inter text-sm font-medium">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-72 min-h-screen relative">
+<!-- TopAppBar -->
+<header class="bg-[#f8fafb]/80 dark:bg-[#162839]/80 backdrop-blur-xl flex justify-between items-center px-8 h-20 w-full sticky top-0 z-40 shadow-sm dark:shadow-none">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-[#162839] dark:text-[#f8fafb] uppercase font-manrope">The Mindful Curator</span>
+<div class="hidden lg:flex items-center gap-2 bg-[#f2f4f5] dark:bg-[#395f94]/20 px-4 py-2 rounded-full">
+<span class="material-symbols-outlined text-outline text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-48 text-[#162839] dark:text-[#f8fafb]" placeholder="Search packages..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<nav class="hidden md:flex items-center gap-6 mr-4">
+<a class="text-[#54b6b5] font-manrope tracking-tight font-semibold" href="#">Pattaya</a>
+<a class="text-[#395f94] dark:text-[#a0aec0] font-manrope tracking-tight font-medium hover:text-[#54b6b5] transition-colors" href="#">Chachoengsao</a>
+<a class="text-[#395f94] dark:text-[#a0aec0] font-manrope tracking-tight font-medium hover:text-[#54b6b5] transition-colors" href="#">Kanchanaburi</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="bg-primary text-white px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-secondary transition-all shadow-md active:scale-95">
+<span class="material-symbols-outlined text-sm">add</span>
+<span>New Package</span>
+</button>
+<div class="flex items-center gap-1 border-l border-outline-variant/30 pl-4">
+<button class="p-2 text-[#395f94] hover:text-[#54b6b5] transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img alt="Studio Owner Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8L-KvNxnhtdX4lbNsdBAtDur06D8swXn0nzWmGXxYjATEX1pU8TklXJo1aXjeaKcbbRX-qt_m-4kcnra-2CmRkgWmCFkbATSq_8sLLFVZQskT_u1GyTaZu6FoM-tZ0mgsNE7iOPFW0cf_tVubGBBWbSPLXmIcTnuJ85X1Go2mgkDQB3AJGV3x6_3mzuGIhCAjcl4Pyh-dIWfFI3yI6mI5AMpnNMLoYNNSADZtqb0YUtvb7Ro2z08cJJhj0FSt_HdzZMdH3tyCHg"/>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Page Hero -->
+<section class="px-8 pt-10 pb-6 flex flex-col md:flex-row justify-between items-end gap-6">
+<div class="max-w-2xl">
+<h1 class="text-5xl font-manrope font-extrabold text-primary tracking-tight mb-4 leading-none">Package Management</h1>
+<p class="text-secondary font-medium max-w-lg leading-relaxed">
+                    Design and manage boutique experiences. Curate pricing, availability, and eligibility across your signature studio branches.
+                </p>
+</div>
+<div class="flex items-center gap-3">
+<div class="relative group">
+<button class="flex items-center gap-2 bg-surface-container-low px-6 py-2.5 rounded-full text-sm font-bold text-primary border border-outline-variant/20 hover:bg-surface-container-high transition-all">
+<span>Filter: All Branches</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Hybrid Content: List Expanded -->
+<section class="px-8 pb-20">
+<div class="space-y-4">
+<div class="bg-white rounded-2xl premium-shadow overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-surface-container-low border-b border-outline-variant/10">
+<tr>
+<th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-secondary">Package</th>
+<th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-secondary text-center">Sessions</th>
+<th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-secondary">Price</th>
+<th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-secondary text-center">Status</th>
+<th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-secondary text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<!-- Elite 20 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg overflow-hidden bg-primary-container shrink-0">
+<img alt="Elite 20" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYhlzE35Z83jhJAcP4AuqEZr25P-tNcCMbn_kf6kLpHn6gxNkfxrPLKi4nrw5DhBgyBBmhjYem847BI2o_eMF1Bjnu1W4nL5nvrzZ0qFuZr0OEhNEegah-1PdVIZB6cvqSWHY_zp8o0F1UPdXOxEQv7R_0RCejhFTH41mLekNuXsZV6WaNbbW_sQ_QAoKxZObjJ3pM-1_iSby8ukihnXm6rZrX0WJTX2k68QUC9-53vS8q6TfOWc6pe9hUOQbTj4eG3mWtKeGGqw"/>
+</div>
+<div>
+<p class="font-bold text-primary">Elite 20</p>
+<p class="text-[10px] text-secondary font-medium uppercase">Pattaya, Kanchanaburi</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="text-sm font-semibold text-primary">20</span>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm font-bold text-primary">฿24,500</span>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="px-2 py-1 bg-tertiary-fixed text-on-tertiary-fixed text-[10px] font-bold uppercase rounded-full">Sale</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-2 text-secondary hover:text-primary transition-colors flex items-center gap-1 border border-transparent hover:border-outline-variant/30 rounded-lg">
+<span class="material-symbols-outlined text-xl">edit</span>
+<span class="text-xs font-bold uppercase">Edit</span>
+</button>
+<button class="p-2 text-secondary hover:text-error transition-colors">
+<span class="material-symbols-outlined text-xl">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Standard 10 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary">inventory_2</span>
+</div>
+<div>
+<p class="font-bold text-primary">Standard 10</p>
+<p class="text-[10px] text-secondary font-medium uppercase">All Branches</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="text-sm font-semibold text-primary">10</span>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm font-bold text-primary">฿12,000</span>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="px-2 py-1 bg-primary-fixed text-on-primary-fixed text-[10px] font-bold uppercase rounded-full">Pre-sale</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-2 text-secondary hover:text-primary transition-colors flex items-center gap-1 border border-transparent hover:border-outline-variant/30 rounded-lg">
+<span class="material-symbols-outlined text-xl">edit</span>
+<span class="text-xs font-bold uppercase">Edit</span>
+</button>
+<button class="p-2 text-secondary hover:text-error transition-colors">
+<span class="material-symbols-outlined text-xl">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Starter 5 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors opacity-70">
+<td class="px-6 py-4">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-surface-container-high flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-outline">image</span>
+</div>
+<div>
+<p class="font-bold text-primary">Starter 5</p>
+<p class="text-[10px] text-secondary font-medium uppercase">Chachoengsao</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="text-sm font-semibold text-primary">5</span>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm font-bold text-primary">฿6,500</span>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="px-2 py-1 bg-outline-variant/30 text-secondary text-[10px] font-bold uppercase rounded-full">Inactive</span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-2 text-secondary hover:text-primary transition-colors flex items-center gap-1 border border-transparent hover:border-outline-variant/30 rounded-lg">
+<span class="material-symbols-outlined text-xl">edit</span>
+<span class="text-xs font-bold uppercase">Edit</span>
+</button>
+<button class="p-2 text-secondary hover:text-error transition-colors">
+<span class="material-symbols-outlined text-xl">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Pro Tip Context -->
+<div class="bg-surface-container-low p-6 rounded-xl border-l-4 border-on-tertiary-container mt-6">
+<p class="font-manrope font-bold text-primary mb-1">Curation Tip</p>
+<p class="text-xs text-secondary leading-relaxed">
+                        Packages marked as 'Active' are visible across booking portals for selected branches. Ensure pricing strategies reflect the premium nature of the boutique. Use the 'Edit' action to refine specific pricing or session details.
+                    </p>
+</div>
+</div>
+</section>
+</main>
+</body></html>

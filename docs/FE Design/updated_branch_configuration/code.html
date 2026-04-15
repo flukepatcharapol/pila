@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Branch Configuration | Azure Studio Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#1e477b",
+                        "on-primary-fixed": "#091d2e",
+                        "surface-variant": "#e1e3e4",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface-variant": "#43474c",
+                        "surface": "#f8fafb",
+                        "tertiary-fixed-dim": "#76d6d5",
+                        "secondary-container": "#9ec2fe",
+                        "surface-dim": "#d8dadb",
+                        "secondary-fixed-dim": "#a7c8ff",
+                        "outline-variant": "#c4c6cd",
+                        "surface-tint": "#4e6073",
+                        "surface-container": "#eceeef",
+                        "on-tertiary-container": "#54b6b5",
+                        "on-primary-fixed-variant": "#36485b",
+                        "surface-container-high": "#e6e8e9",
+                        "on-surface": "#191c1d",
+                        "on-secondary-fixed": "#001c3b",
+                        "outline": "#74777d",
+                        "surface-bright": "#f8fafb",
+                        "primary-fixed": "#d1e4fb",
+                        "secondary": "#395f94",
+                        "on-tertiary-fixed": "#002020",
+                        "on-error-container": "#93000a",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed-variant": "#004f4f",
+                        "inverse-on-surface": "#eff1f2",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#2c3e50",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#2e3132",
+                        "on-error": "#ffffff",
+                        "on-secondary-container": "#284f83",
+                        "tertiary-container": "#004444",
+                        "surface-container-low": "#f2f4f5",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-highest": "#e1e3e4",
+                        "background": "#f8fafb",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#b5c8df",
+                        "on-background": "#191c1d",
+                        "secondary-fixed": "#d5e3ff",
+                        "on-primary-container": "#96a9be",
+                        "primary": "#162839",
+                        "inverse-primary": "#b5c8df",
+                        "tertiary-fixed": "#93f2f2",
+                        "tertiary": "#002c2c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .tonal-layering { transition: background-color 0.3s ease; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e1e3e4; border-radius: 10px; }
+
+        /* Slide-out Panel Logic */
+        #branch-details-panel {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #branch-details-panel.translate-x-full {
+            transform: translateX(100%);
+        }
+        #branch-details-panel.translate-x-0 {
+            transform: translateX(0);
+        }
+        .panel-overlay {
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .panel-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface flex min-h-screen overflow-x-hidden">
+<!-- SideNavBar -->
+<aside class="h-screen w-72 flex flex-col sticky top-0 left-0 bg-[#f2f4f5] dark:bg-slate-900 font-['Manrope'] text-sm tracking-tight border-r-0 z-50">
+<div class="text-xl font-bold text-[#162839] dark:text-white px-6 py-8">
+            Azure Studio Pro
+            <p class="text-[10px] uppercase tracking-[0.2em] font-medium text-[#395f94] mt-1">Studio Management</p>
+</div>
+<nav class="flex flex-col h-full overflow-y-auto py-2 custom-scrollbar">
+<a class="text-[#395f94] dark:text-slate-400 px-8 py-3 flex items-center gap-3 hover:text-[#54b6b5] hover:bg-white/50 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span> Dashboard
+            </a>
+<a class="text-[#395f94] dark:text-slate-400 px-8 py-3 flex items-center gap-3 hover:text-[#54b6b5] hover:bg-white/50 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px]">event_repeat</span> Customer Session
+            </a>
+<a class="text-[#395f94] dark:text-slate-400 px-8 py-3 flex items-center gap-3 hover:text-[#54b6b5] hover:bg-white/50 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px]">calendar_today</span> Booking
+            </a>
+<a class="text-[#395f94] dark:text-slate-400 px-8 py-3 flex items-center gap-3 hover:text-[#54b6b5] hover:bg-white/50 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px]">group</span> Customer
+            </a>
+<a class="text-[#395f94] dark:text-slate-400 px-8 py-3 flex items-center gap-3 hover:text-[#54b6b5] hover:bg-white/50 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px]">shopping_cart</span> Order
+            </a>
+<a class="text-[#395f94] dark:text-slate-400 px-8 py-3 flex items-center gap-3 hover:text-[#54b6b5] hover:bg-white/50 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px]">description</span> Signature Print
+            </a>
+<!-- Updated Order and Icons -->
+<a class="text-[#395f94] dark:text-slate-400 px-8 py-3 flex items-center gap-3 hover:text-[#54b6b5] hover:bg-white/50 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px]">person_pin</span> Trainer
+            </a>
+<a class="text-[#395f94] dark:text-slate-400 px-8 py-3 flex items-center gap-3 hover:text-[#54b6b5] hover:bg-white/50 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px]">support_agent</span> Consultant
+            </a>
+<a class="text-[#395f94] dark:text-slate-400 px-8 py-3 flex items-center gap-3 hover:text-[#54b6b5] hover:bg-white/50 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px]">inventory_2</span> Package
+            </a>
+<a class="text-[#395f94] dark:text-slate-400 px-8 py-3 flex items-center gap-3 hover:text-[#54b6b5] hover:bg-white/50 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px]">person_book</span> User
+            </a>
+<!-- Active State: Branch -->
+<a class="text-[#54b6b5] font-bold bg-[#ffffff] dark:bg-slate-800 rounded-l-full ml-4 pl-4 py-3 flex items-center gap-3 group" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">store</span> Branch
+            </a>
+<a class="text-[#395f94] dark:text-slate-400 px-8 py-3 flex items-center gap-3 hover:text-[#54b6b5] hover:bg-white/50 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px]">lock_person</span> Permission
+            </a>
+<a class="text-[#395f94] dark:text-slate-400 px-8 py-3 flex items-center gap-3 hover:text-[#54b6b5] hover:bg-white/50 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span> Setting
+            </a>
+<a class="text-[#395f94] dark:text-slate-400 px-8 py-3 flex items-center gap-3 hover:text-[#54b6b5] hover:bg-white/50 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span> Help
+            </a>
+</nav>
+<div class="mt-auto p-6">
+<div class="flex items-center gap-3 bg-white/40 dark:bg-slate-800/40 p-3 rounded-xl">
+<img class="w-10 h-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSBpcX19_ODZX8J4PHTTrEjdCBNyVWGmP8aePk_5fQqq0F0blhDpJplOY4Yc3ocdT_kgUpalUYE2krhbqIErgkxKDhz1krJZbV7JCiMMsiWGsYlxT-OxVrJNVtUWfLYEJBTmIzp69S0s8u34CqM33OsDOfJyniP8COW9sPlwEO0FYWpjyeIeigM3hiUh7YW6C0f33iWGMJq8_OQAO8SpWl3dd-A2tccKtXn_VcWf3DEPT6UkSot5Cisn8K1jQrOKp3muShtDLplQ"/>
+<div>
+<p class="text-xs font-bold text-primary leading-tight">Alex Sterling</p>
+<p class="text-[10px] text-secondary">Studio Owner</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 bg-surface min-h-screen p-8 lg:p-12">
+<!-- Header Section -->
+<header class="flex justify-between items-end mb-12">
+<div class="space-y-1">
+<h1 class="text-4xl font-extrabold text-primary tracking-tight">Branch Configuration</h1>
+<p class="text-secondary font-medium opacity-80">Manage your studio locations and regional settings</p>
+</div>
+<button class="bg-gradient-to-r from-primary to-primary-container text-white px-6 py-3 rounded-xl flex items-center gap-2 shadow-lg shadow-primary/10 hover:scale-[1.02] transition-transform duration-200">
+<span class="material-symbols-outlined">add</span>
+<span class="font-semibold text-sm">Add New Branch</span>
+</button>
+</header>
+<!-- Bento Layout -->
+<div class="grid grid-cols-12 gap-8">
+<!-- Left Side Cards -->
+<div class="col-span-12 lg:col-span-3 space-y-6">
+<div class="bg-surface-container-low p-6 rounded-xl space-y-4">
+<p class="text-[10px] font-bold uppercase tracking-widest text-on-tertiary-container">Branch Health</p>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<span class="text-sm font-medium">Total Branches</span>
+<span class="text-lg font-bold text-primary">03</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-sm font-medium">Active Regions</span>
+<span class="text-lg font-bold text-primary">02</span>
+</div>
+</div>
+</div>
+<div class="glass-card p-6 rounded-xl border border-white/20 relative overflow-hidden group">
+<div class="relative z-10">
+<span class="material-symbols-outlined text-[#54b6b5] mb-2">auto_awesome</span>
+<h3 class="font-bold text-primary mb-1">Global Prefixing</h3>
+<p class="text-xs text-secondary leading-relaxed">Centralize your billing and student identification codes across all locations.</p>
+</div>
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition-transform duration-500">
+<span class="material-symbols-outlined text-[100px]">settings_input_component</span>
+</div>
+</div>
+</div>
+<!-- Table Section -->
+<div class="col-span-12 lg:col-span-9">
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm border border-surface-container">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low">
+<th class="px-8 py-5 text-[11px] font-bold uppercase tracking-widest text-secondary/70">Branch Name</th>
+<th class="px-8 py-5 text-[11px] font-bold uppercase tracking-widest text-secondary/70">Branch Prefix</th>
+<th class="px-8 py-5 text-[11px] font-bold uppercase tracking-widest text-secondary/70">Branch Postfix</th>
+<th class="px-8 py-5 text-right text-[11px] font-bold uppercase tracking-widest text-secondary/70">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors duration-150 group">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-primary-fixed flex items-center justify-center text-primary font-bold">MP</div>
+<div>
+<p class="font-bold text-primary">Mindful Pattaya Central</p>
+<p class="text-xs text-secondary/60">Beach Front, Chonburi</p>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<span class="px-3 py-1 bg-surface-container-high rounded-full text-xs font-mono font-semibold text-primary">BPY</span>
+</td>
+<td class="px-8 py-6">
+<span class="px-3 py-1 bg-surface-container-high rounded-full text-xs font-mono font-semibold text-primary">01</span>
+</td>
+<td class="px-8 py-6 text-right">
+<div class="flex justify-end gap-2">
+<button class="flex items-center gap-1 px-3 py-1.5 bg-surface-container-high hover:bg-primary/10 text-primary rounded-lg transition-colors text-xs font-semibold" onclick="openBranchPanel('Mindful Pattaya Central', 'BPY', '01')">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+                                            Edit
+                                        </button>
+<button class="p-2 hover:bg-error-container/20 rounded-lg text-error transition-colors" title="Delete">
+<span class="material-symbols-outlined text-xl">delete_outline</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors duration-150 group">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-secondary-fixed flex items-center justify-center text-primary font-bold">RC</div>
+<div>
+<p class="font-bold text-primary">Riverside Chachoengsao</p>
+<p class="text-xs text-secondary/60">Bang Pakong District</p>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<span class="px-3 py-1 bg-surface-container-high rounded-full text-xs font-mono font-semibold text-primary">BCH</span>
+</td>
+<td class="px-8 py-6">
+<span class="px-3 py-1 bg-surface-container-high rounded-full text-xs font-mono font-semibold text-primary">02</span>
+</td>
+<td class="px-8 py-6 text-right">
+<div class="flex justify-end gap-2">
+<button class="flex items-center gap-1 px-3 py-1.5 bg-surface-container-high hover:bg-primary/10 text-primary rounded-lg transition-colors text-xs font-semibold" onclick="openBranchPanel('Riverside Chachoengsao', 'BCH', '02')">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+                                            Edit
+                                        </button>
+<button class="p-2 hover:bg-error-container/20 rounded-lg text-error transition-colors" title="Delete">
+<span class="material-symbols-outlined text-xl">delete_outline</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors duration-150 group">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-tertiary-fixed flex items-center justify-center text-tertiary font-bold">KH</div>
+<div>
+<p class="font-bold text-primary">Kanchanaburi Hub</p>
+<p class="text-xs text-secondary/60">River Kwai Valley</p>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<span class="px-3 py-1 bg-surface-container-high rounded-full text-xs font-mono font-semibold text-primary">BKN</span>
+</td>
+<td class="px-8 py-6">
+<span class="px-3 py-1 bg-surface-container-high rounded-full text-xs font-mono font-semibold text-primary">03</span>
+</td>
+<td class="px-8 py-6 text-right">
+<div class="flex justify-end gap-2">
+<button class="flex items-center gap-1 px-3 py-1.5 bg-surface-container-high hover:bg-primary/10 text-primary rounded-lg transition-colors text-xs font-semibold" onclick="openBranchPanel('Kanchanaburi Hub', 'BKN', '03')">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+                                            Edit
+                                        </button>
+<button class="p-2 hover:bg-error-container/20 rounded-lg text-error transition-colors" title="Delete">
+<span class="material-symbols-outlined text-xl">delete_outline</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="bg-surface-container-low/30 px-8 py-6 flex justify-between items-center border-t border-surface-container">
+<p class="text-xs text-secondary/50">Viewing 1-3 of 3 branch configurations</p>
+<div class="flex gap-4">
+<button class="text-xs font-semibold text-secondary hover:text-primary transition-colors disabled:opacity-30" disabled="">Previous</button>
+<button class="text-xs font-semibold text-primary hover:text-secondary transition-colors">Next</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Slide-out Branch Details Panel Overlay -->
+<div class="panel-overlay fixed inset-0 bg-primary/20 backdrop-blur-sm z-[60] opacity-0" id="panel-overlay" onclick="closeBranchPanel()"></div>
+<!-- Branch Details Panel -->
+<aside class="fixed top-0 right-0 h-full w-full max-w-md bg-white dark:bg-slate-900 shadow-2xl z-[70] translate-x-full overflow-y-auto" id="branch-details-panel">
+<div class="p-8">
+<div class="flex justify-between items-center mb-10">
+<h2 class="text-2xl font-extrabold text-primary tracking-tight">Branch Details</h2>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors" onclick="closeBranchPanel()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="space-y-8">
+<!-- Branch Information Fields -->
+<div class="space-y-6">
+<div class="space-y-2">
+<label class="text-[10px] font-bold uppercase tracking-widest text-secondary block">Branch Name</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 text-sm font-medium" id="panel-branch-name" type="text" value="Mindful Pattaya Central"/>
+</div>
+<div class="grid grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="text-[10px] font-bold uppercase tracking-widest text-secondary block">Branch Prefix</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 text-sm font-mono font-semibold" id="panel-branch-prefix" type="text" value="BPY"/>
+</div>
+<div class="space-y-2">
+<label class="text-[10px] font-bold uppercase tracking-widest text-secondary block">Branch Postfix</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 text-sm font-mono font-semibold" id="panel-branch-postfix" type="text" value="01"/>
+</div>
+</div>
+</div>
+<div class="pt-6 border-t border-surface-container space-y-4">
+<button class="w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-primary-container transition-colors shadow-lg shadow-primary/10" onclick="closeBranchPanel()">
+                        Save Configuration
+                    </button>
+<button class="w-full bg-transparent text-secondary font-bold py-4 rounded-xl hover:bg-surface-container-low transition-colors" onclick="closeBranchPanel()">
+                        Cancel Changes
+                    </button>
+</div>
+</div>
+</div>
+</aside>
+<script>
+        const panel = document.getElementById('branch-details-panel');
+        const overlay = document.getElementById('panel-overlay');
+
+        function openBranchPanel(name, prefix, postfix) {
+            document.getElementById('panel-branch-name').value = name;
+            document.getElementById('panel-branch-prefix').value = prefix;
+            document.getElementById('panel-branch-postfix').value = postfix;
+
+            panel.classList.remove('translate-x-full');
+            panel.classList.add('translate-x-0');
+            overlay.classList.add('active');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        function closeBranchPanel() {
+            panel.classList.remove('translate-x-0');
+            panel.classList.add('translate-x-full');
+            overlay.classList.remove('active');
+            document.body.classList.remove('overflow-hidden');
+        }
+    </script>
+</body></html>

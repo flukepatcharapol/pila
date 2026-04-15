@@ -1,0 +1,387 @@
+<html class="light" lang="en"><head></head><body class="bg-surface text-on-surface">```html
+
+
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Consultant Management | Mindful Curator</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f2f4f5",
+                        "surface-bright": "#f8fafb",
+                        "outline": "#74777d",
+                        "on-secondary-fixed-variant": "#1e477b",
+                        "on-secondary": "#ffffff",
+                        "surface": "#f8fafb",
+                        "tertiary-container": "#004444",
+                        "primary-container": "#2c3e50",
+                        "on-background": "#191c1d",
+                        "primary-fixed": "#d1e4fb",
+                        "secondary": "#395f94",
+                        "primary": "#162839",
+                        "tertiary": "#002c2c",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#4e6073",
+                        "on-primary-fixed-variant": "#36485b",
+                        "on-tertiary-container": "#54b6b5",
+                        "on-error": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#b5c8df",
+                        "secondary-fixed-dim": "#a7c8ff",
+                        "on-tertiary-fixed": "#002020",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e1e3e4",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#eff1f2",
+                        "tertiary-fixed": "#93f2f2",
+                        "primary-fixed-dim": "#b5c8df",
+                        "surface-container-high": "#e6e8e9",
+                        "on-surface": "#191c1d",
+                        "tertiary-fixed-dim": "#76d6d5",
+                        "on-primary-container": "#96a9be",
+                        "on-surface-variant": "#43474c",
+                        "on-secondary-fixed": "#001c3b",
+                        "on-primary-fixed": "#091d2e",
+                        "secondary-container": "#9ec2fe",
+                        "on-secondary-container": "#284f83",
+                        "error": "#ba1a1a",
+                        "on-primary": "#ffffff",
+                        "background": "#f8fafb",
+                        "surface-container-highest": "#e1e3e4",
+                        "outline-variant": "#c4c6cd",
+                        "inverse-surface": "#2e3132",
+                        "surface-dim": "#d8dadb",
+                        "surface-container": "#eceeef",
+                        "secondary-fixed": "#d5e3ff",
+                        "on-tertiary-fixed-variant": "#004f4f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafb; }
+        .font-manrope { font-family: 'Manrope', sans-serif; }
+    </style>
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 overflow-y-auto bg-[#f2f4f5] dark:bg-slate-900 flex flex-col py-6 font-manrope tracking-tight text-sm z-50">
+<div class="text-xl font-bold text-[#162839] dark:text-white px-6 py-8">
+            Mindful Curator
+        </div>
+<nav class="flex-1 space-y-1">
+<!-- Dashboard -->
+<a class="text-[#395f94] dark:text-slate-400 hover:text-[#162839] px-8 py-3 transition-colors flex items-center gap-3 hover:bg-[#e6e8e9] dark:hover:bg-slate-800 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<!-- Customer Session -->
+<a class="text-[#395f94] dark:text-slate-400 hover:text-[#162839] px-8 py-3 transition-colors flex items-center gap-3 hover:bg-[#e6e8e9] dark:hover:bg-slate-800 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">event_seat</span>
+<span>Customer Session</span>
+</a>
+<!-- Booking -->
+<a class="text-[#395f94] dark:text-slate-400 hover:text-[#162839] px-8 py-3 transition-colors flex items-center gap-3 hover:bg-[#e6e8e9] dark:hover:bg-slate-800 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span>Booking</span>
+</a>
+<!-- Customer -->
+<a class="text-[#395f94] dark:text-slate-400 hover:text-[#162839] px-8 py-3 transition-colors flex items-center gap-3 hover:bg-[#e6e8e9] dark:hover:bg-slate-800 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">group</span>
+<span>Customer</span>
+</a>
+<!-- Order -->
+<a class="text-[#395f94] dark:text-slate-400 hover:text-[#162839] px-8 py-3 transition-colors flex items-center gap-3 hover:bg-[#e6e8e9] dark:hover:bg-slate-800 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">shopping_cart</span>
+<span>Order</span>
+</a>
+<!-- Signature Print -->
+<a class="text-[#395f94] dark:text-slate-400 hover:text-[#162839] px-8 py-3 transition-colors flex items-center gap-3 hover:bg-[#e6e8e9] dark:hover:bg-slate-800 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">description</span>
+<span>Signature Print</span>
+</a>
+<!-- Trainer -->
+<a class="text-[#395f94] dark:text-slate-400 hover:text-[#162839] px-8 py-3 transition-colors flex items-center gap-3 hover:bg-[#e6e8e9] dark:hover:bg-slate-800 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span>Trainer</span>
+</a>
+<!-- Consultant (ACTIVE) -->
+<a class="text-[#54b6b5] font-bold bg-white dark:bg-slate-800 rounded-l-full ml-4 pl-4 py-3 flex items-center gap-3 transition-transform" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span>Consultant</span>
+</a>
+<!-- Package -->
+<a class="text-[#395f94] dark:text-slate-400 hover:text-[#162839] px-8 py-3 transition-colors flex items-center gap-3 hover:bg-[#e6e8e9] dark:hover:bg-slate-800 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span>Package</span>
+</a>
+<!-- User -->
+<a class="text-[#395f94] dark:text-slate-400 hover:text-[#162839] px-8 py-3 transition-colors flex items-center gap-3 hover:bg-[#e6e8e9] dark:hover:bg-slate-800 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">person_book</span>
+<span>User</span>
+</a>
+<!-- Branch -->
+<a class="text-[#395f94] dark:text-slate-400 hover:text-[#162839] px-8 py-3 transition-colors flex items-center gap-3 hover:bg-[#e6e8e9] dark:hover:bg-slate-800 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">store</span>
+<span>Branch</span>
+</a>
+<!-- Permission -->
+<a class="text-[#395f94] dark:text-slate-400 hover:text-[#162839] px-8 py-3 transition-colors flex items-center gap-3 hover:bg-[#e6e8e9] dark:hover:bg-slate-800 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">vpn_key</span>
+<span>Permission</span>
+</a>
+<!-- Setting -->
+<a class="text-[#395f94] dark:text-slate-400 hover:text-[#162839] px-8 py-3 transition-colors flex items-center gap-3 hover:bg-[#e6e8e9] dark:hover:bg-slate-800 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Setting</span>
+</a>
+<!-- Help -->
+<a class="text-[#395f94] dark:text-slate-400 hover:text-[#162839] px-8 py-3 transition-colors flex items-center gap-3 hover:bg-[#e6e8e9] dark:hover:bg-slate-800 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">help</span>
+<span>Help</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 min-h-screen">
+<!-- TopAppBar -->
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-[#191c1d]/5 flex justify-between items-center px-12 h-20 font-manrope text-sm font-medium">
+<div class="flex items-center gap-8">
+<h1 class="text-[#162839] font-bold text-lg">Consultant Management</h1>
+<nav class="flex gap-6">
+<a class="text-[#395f94] hover:text-[#162839] transition-opacity cursor-pointer" href="#">Directory</a>
+<a class="text-[#162839] border-b-2 border-[#54b6b5] pb-2 cursor-pointer" href="#">Analytics</a>
+<a class="text-[#395f94] hover:text-[#162839] transition-opacity cursor-pointer" href="#">Schedules</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative">
+<input class="bg-surface-container-low border-none rounded-full px-4 py-2 text-xs w-64 focus:ring-1 focus:ring-secondary/20" placeholder="Search consultants..." type="text"/>
+<span class="material-symbols-outlined absolute right-3 top-2 text-outline text-sm">search</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-secondary hover:opacity-80 cursor-pointer">notifications</span>
+<span class="material-symbols-outlined text-secondary hover:opacity-80 cursor-pointer">apps</span>
+<img alt="Administrator" class="w-8 h-8 rounded-full border border-surface-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWfgjlItbDg5SPudxDC7JhmqHVGOTQjklc1BFKvX9emCzTAWX2cbbg0Gq6pacTVX5_3bp86goC9oSKKcP3GiU3cv92_mVGU8NT9SybggHjWINIGkYuUSJyOY_stMYWIIIjX4YbRy9IaOk4M4xWzb7OkJpTifHq02oZsNkiSZAU4BFk15fMdUzZNEsiXpdqKO0QVdLcQk9XEm4-Egai8a9-zxUwbPvXYUo5JpiyHDUkEc_CIp9Dh35dubJ7DDwRYAkv7mZubzWI6A"/>
+</div>
+</div>
+</header>
+<!-- Page Canvas -->
+<section class="pt-28 px-12 pb-12">
+<!-- Hero Header -->
+<div class="flex justify-between items-end mb-12">
+<div>
+<h2 class="font-manrope text-4xl font-extrabold text-primary tracking-tight mb-2">Consultant</h2>
+<p class="text-secondary max-w-lg font-body leading-relaxed">
+                        Manage and monitor performance metrics for your specialized consultant team.
+                    </p>
+</div>
+<button class="bg-gradient-to-r from-primary to-primary-container text-on-primary px-6 py-3 rounded-xl font-manrope font-bold flex items-center gap-2 hover:opacity-90 transition-all shadow-sm active:scale-95">
+<span class="material-symbols-outlined text-lg">add</span>
+                    Add Consultant
+                </button>
+</div>
+<!-- Consultant Table -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0px_20px_40px_rgba(25,28,29,0.06)]">
+<div class="p-8 border-b border-outline-variant/5 flex justify-between items-center bg-white">
+<h3 class="font-manrope text-xl font-bold text-primary">Staff Directory</h3>
+<div class="flex items-center gap-4">
+<button class="text-sm font-bold text-secondary flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+                            Filters
+                        </button>
+<button class="text-sm font-bold text-secondary flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-sm">download</span>
+                            Export
+                        </button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-surface-container-low text-[10px] uppercase tracking-[0.15em] text-outline font-bold">
+<tr>
+<th class="px-8 py-4">Consultant</th>
+<th class="px-8 py-4">Branch</th>
+<th class="px-8 py-4">MTD Hours</th>
+<th class="px-8 py-4">Status</th>
+<th class="px-8 py-4 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-transparent">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low/40 transition-colors group">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container-high">
+<img class="w-full h-full object-cover" data-alt="professional portrait of Elena Thorne, lead Pilates consultant, serene expression, natural lighting in studio setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcSwsZvy_NWaBeZQCyWin-_uSQlfCyn40VAHPG9aes0XF5FabKY9BKe0Nn9zWp6Hp3e0tOD9DOjxHI45AvnZGSeC5-cwqlG4rMbtk8hrLwXL9a4ZfiUKs7bOY97QGFn3vyiXWth6ZG6ec--MJoznzeQ6yxU7FSVYlhs1vXyzRupjvxEbXjcGz1ACuQxxmhx7oKMxdbGNd7ecrk5QbworsgrTQJhOUVeIvhNrqwAIcnja77GM0_jP0H2t1crCdLS7865rhuNT-JfQ"/>
+</div>
+<div>
+<div class="font-manrope font-bold text-primary text-sm">Elena Thorne</div>
+<div class="text-xs text-outline font-medium">Lead Pilates Consultant</div>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-secondary">location_on</span>
+<span class="text-sm text-primary font-medium">Pattaya</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="text-sm font-bold text-primary">164.5 <span class="text-[10px] text-outline font-normal">hrs</span></div>
+</td>
+<td class="px-8 py-6">
+<span class="inline-flex items-center gap-1.5 bg-[#d1e4fb] text-on-primary-fixed-variant px-3 py-1 rounded-full text-[10px] font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+                                        Active
+                                    </span>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="bg-surface-container-highest text-secondary text-[11px] font-bold px-4 py-2 rounded-xl hover:bg-secondary hover:text-white transition-all">
+                                        View Analytics
+                                    </button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="bg-surface-container-low/20 hover:bg-surface-container-low/40 transition-colors group">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container-high">
+<img class="w-full h-full object-cover" data-alt="close-up portrait of Marcus Vane, Yoga specialist, confident and calm demeanor, professional studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsgd9GqxTinZSbnEKgk-VTOKYj0MZ2LuEtosYXouj1Ns6SpfHB8p-qGm9EpPq4EmNLqS_fJ-n3L2Rsm5xf_M6xtD2Oif2DPMSVPjE_qzcvttKBka_Mg1P69_M5YeIbFj6vWOL7F-wQUiB3XsHsXMYKP4ee4H3j8ShQW0ijKlt7QuPG4H5EpsRJmG4yvRsr91w8mlshHKnMUa0qUPhBvsnkAVsO6hvxOcX2xPu6z3EnpVlV-Wo10r5MnSQaK4Phu3b_voESpMJdSA"/>
+</div>
+<div>
+<div class="font-manrope font-bold text-primary text-sm">Marcus Vane</div>
+<div class="text-xs text-outline font-medium">Yoga Specialist</div>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-secondary">location_on</span>
+<span class="text-sm text-primary font-medium">Chachoengsao</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="text-sm font-bold text-primary">142.0 <span class="text-[10px] text-outline font-normal">hrs</span></div>
+</td>
+<td class="px-8 py-6">
+<span class="inline-flex items-center gap-1.5 bg-[#d1e4fb] text-on-primary-fixed-variant px-3 py-1 rounded-full text-[10px] font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                                        Active
+                                    </span>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="bg-surface-container-highest text-secondary text-[11px] font-bold px-4 py-2 rounded-xl hover:bg-secondary hover:text-white transition-all">
+                                        View Analytics
+                                    </button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low/40 transition-colors group">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container-high">
+<img class="w-full h-full object-cover" data-alt="professional woman consultant Maya Lin, focusing on mindfulness, bright and clean studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQ-8ITXZAsP9oGGTW1kGvLV-Gyg8dtJaOq-INDagF3KUhF_ggJnnIEtPs_Yav7SisGCebIpNEyCtyjip3w2sCK0uOyI3wqG13LNXQiS4JO7svORvKsWw9d2p1SXpf0-feK2UB5DvpV7nS2UNY6Z_Zpl2uAiB6afNEprq1sg8zWK1F5Hi1NXNgFGy3fgglzv9odaBgLpretw-V_sOBTgEVLt0pZQyiR2d6lZmQgAbyWV7VfLEKDxpJ9mAG9qPJI-amaTFjGIpXiCw"/>
+</div>
+<div>
+<div class="font-manrope font-bold text-primary text-sm">Maya Lin</div>
+<div class="text-xs text-outline font-medium">Posture Correction Consultant</div>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-secondary">location_on</span>
+<span class="text-sm text-primary font-medium">Bangkok HQ</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="text-sm font-bold text-primary">128.0 <span class="text-[10px] text-outline font-normal">hrs</span></div>
+</td>
+<td class="px-8 py-6">
+<span class="inline-flex items-center gap-1.5 bg-surface-container-highest text-outline px-3 py-1 rounded-full text-[10px] font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                                        Inactive
+                                    </span>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="bg-surface-container-highest text-secondary text-[11px] font-bold px-4 py-2 rounded-xl hover:bg-secondary hover:text-white transition-all">
+                                        View Analytics
+                                    </button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="bg-surface-container-low/20 hover:bg-surface-container-low/40 transition-colors group">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container-high">
+<img class="w-full h-full object-cover" data-alt="male athletic consultant Julian Rossi, Reformer Pilates specialist, modern industrial gym background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGTXO-j2WRnkqJrH6i_uHvhzPclKlKRUTm1ustdUfQhWNxLLGybnLDBa7FkohCjLVXFs-QTbjj77US49VQYnWLcNTaJEWLxNe606Po6-erxBIUJ-A-KzYhi6TNCMK1xa_kvhx-WgyXwgoyWUxq9TYKNUzJy5GhdkG8GkB6S9DQWkJdQtOPMMbSGEiFe6fm5aZ-BlmGcf6-JgY5rl8qY56kmtyK6jNJAMrGmq6vlcEcGfhxBbKeNJVmAyK-jxB_CiZuuOQ69dPNNA"/>
+</div>
+<div>
+<div class="font-manrope font-bold text-primary text-sm">Julian Rossi</div>
+<div class="text-xs text-outline font-medium">Reformer Technical Specialist</div>
+</div>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-secondary">location_on</span>
+<span class="text-sm text-primary font-medium">Pattaya</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="text-sm font-bold text-primary">192.5 <span class="text-[10px] text-outline font-normal">hrs</span></div>
+</td>
+<td class="px-8 py-6">
+<span class="inline-flex items-center gap-1.5 bg-[#d1e4fb] text-on-primary-fixed-variant px-3 py-1 rounded-full text-[10px] font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                                        Active
+                                    </span>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="bg-surface-container-highest text-secondary text-[11px] font-bold px-4 py-2 rounded-xl hover:bg-secondary hover:text-white transition-all">
+                                        View Analytics
+                                    </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-6 border-t border-outline-variant/5 flex justify-between items-center text-[10px] text-outline font-bold bg-white">
+<div>Showing 1 - 4 of 28 Consultants</div>
+<div class="flex gap-2">
+<button class="p-2 rounded-lg hover:bg-surface-container-low disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined text-lg">chevron_left</span>
+</button>
+<button class="p-2 rounded-lg bg-primary text-white">1</button>
+<button class="p-2 rounded-lg hover:bg-surface-container-low">2</button>
+<button class="p-2 rounded-lg hover:bg-surface-container-low">3</button>
+<button class="p-2 rounded-lg hover:bg-surface-container-low">
+<span class="material-symbols-outlined text-lg">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Signature Component: Capacity Gauge (Floating Utility) -->
+</main>
+```</body></html>

@@ -22,3 +22,5 @@ allure*
 .env.development
 .env.production
 __pycache__/
+
+bruno*

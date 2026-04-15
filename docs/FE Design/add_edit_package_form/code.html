@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Add/Edit Package - The Mindful Curator</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#2e3132",
+                        "primary-container": "#2c3e50",
+                        "surface-bright": "#f8fafb",
+                        "on-tertiary-fixed-variant": "#004f4f",
+                        "on-tertiary-fixed": "#002020",
+                        "on-primary-fixed-variant": "#36485b",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#091d2e",
+                        "surface-container-low": "#f2f4f5",
+                        "inverse-primary": "#b5c8df",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#191c1d",
+                        "on-primary-container": "#96a9be",
+                        "secondary-fixed": "#d5e3ff",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#4e6073",
+                        "on-tertiary-container": "#54b6b5",
+                        "tertiary": "#002c2c",
+                        "surface-container-highest": "#e1e3e4",
+                        "secondary-container": "#9ec2fe",
+                        "primary": "#162839",
+                        "on-secondary-fixed-variant": "#1e477b",
+                        "tertiary-fixed": "#93f2f2",
+                        "primary-fixed-dim": "#b5c8df",
+                        "surface": "#f8fafb",
+                        "on-background": "#191c1d",
+                        "background": "#f8fafb",
+                        "surface-container-high": "#e6e8e9",
+                        "primary-fixed": "#d1e4fb",
+                        "outline": "#74777d",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#c4c6cd",
+                        "on-error": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#004444",
+                        "error": "#ba1a1a",
+                        "on-surface-variant": "#43474c",
+                        "inverse-on-surface": "#eff1f2",
+                        "secondary": "#395f94",
+                        "surface-container": "#eceeef",
+                        "secondary-fixed-dim": "#a7c8ff",
+                        "surface-dim": "#d8dadb",
+                        "tertiary-fixed-dim": "#76d6d5",
+                        "surface-variant": "#e1e3e4",
+                        "on-secondary-container": "#284f83",
+                        "on-secondary-fixed": "#001c3b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased">
+<!-- TopNavBar (JSON Mapping) -->
+<header class="bg-[#f8fafb]/80 dark:bg-[#162839]/80 backdrop-blur-xl docked full-width top-0 sticky z-50 flex justify-between items-center w-full px-8 py-4 shadow-[0px_20px_40px_rgba(25,28,29,0.06)] tonal-bg-shift">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-bold tracking-tighter text-[#162839] dark:text-[#f8fafb]">The Mindful Curator</span>
+<nav class="hidden md:flex gap-6 items-center font-manrope tracking-tight font-bold text-lg">
+<a class="text-[#54b6b5] border-b-2 border-[#54b6b5] pb-1" href="#">Pattaya</a>
+<a class="text-[#395f94] hover:text-[#162839] hover:bg-[#f2f4f5] transition-all duration-300" href="#">Chachoengsao</a>
+<a class="text-[#395f94] hover:text-[#162839] hover:bg-[#f2f4f5] transition-all duration-300" href="#">Kanchanaburi</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-[#162839] font-semibold">Studio Manager</span>
+<div class="relative w-10 h-10 rounded-full bg-surface-container-high overflow-hidden">
+<img alt="User avatar with role indicator" data-alt="Close-up portrait of a professional studio manager with a serene background in soft morning light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBniClOTC8deENwVgF99FqSqmxCeKiNda-2-nzkWIUfDVCmbHDPqO17RnG4TNBB-J1ONH37mi7hKfVgcVB38oVMZQ9H02adPyMIwTAzxu2vd_U4HQEaRMAg6vwM9atHlGEO_hhydnMrDFDs3ETQ_FjvULk3HBr40O8ndn4Y3epTglPMMp4LoJJjSc26JDxVnyuMPfZbfisCU-4qTr7R5OFrWBZ5HerNPw8q9mVPnjUDTziTMG3xAIj6QY1gzgt49ffcj3yTyfE48w"/>
+</div>
+</div>
+</header>
+<div class="flex min-h-[calc(100vh-80px)]">
+<!-- SideNavBar (JSON Mapping) -->
+<aside class="h-screen w-64 fixed left-0 top-0 z-40 bg-[#f2f4f5] dark:bg-[#162839] flex flex-col p-6 gap-y-2 font-manrope font-semibold text-sm tonal-layering surface-container-low flat no-shadows">
+<div class="mb-8 mt-2">
+<h2 class="font-manrope font-extrabold text-[#162839] dark:text-[#f8fafb] text-xl">Mindful Studio</h2>
+<p class="text-secondary opacity-70 text-xs uppercase tracking-widest">Management Suite</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-[#395f94] dark:text-slate-400 hover:bg-[#e6e8e9] dark:hover:bg-slate-800 transition-transform duration-200 hover:translate-x-1 cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+                    Activity Log
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#395f94] dark:text-slate-400 hover:bg-[#e6e8e9] dark:hover:bg-slate-800 transition-transform duration-200 hover:translate-x-1 cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+                    Client Info
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-white dark:bg-[#395f94] text-[#162839] dark:text-white rounded-lg shadow-sm font-bold transition-transform duration-200 hover:translate-x-1 cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="settings_accessibility">settings_accessibility</span>
+                    Operations
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#395f94] dark:text-slate-400 hover:bg-[#e6e8e9] dark:hover:bg-slate-800 transition-transform duration-200 hover:translate-x-1 cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+                    Management
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#395f94] dark:text-slate-400 hover:bg-[#e6e8e9] dark:hover:bg-slate-800 transition-transform duration-200 hover:translate-x-1 cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                    Settings
+                </a>
+</nav>
+<div class="mt-auto pt-6 border-t border-outline-variant/10">
+<button class="w-full bg-primary text-white py-3 rounded-xl font-bold mb-4 shadow-lg hover:opacity-90 transition-all scale-98 active:opacity-80">
+                    Session Deduction
+                </button>
+<a class="flex items-center gap-3 px-4 py-3 text-[#395f94] hover:translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+                    Help Center
+                </a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-64 p-12 bg-surface">
+<!-- Breadcrumbs -->
+<div class="mb-12 flex items-center text-secondary text-sm gap-2 opacity-60">
+<span>Management</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span>Packages</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="text-primary font-semibold">Add Package</span>
+</div>
+<!-- Form Container -->
+<div class="max-w-3xl mx-auto">
+<header class="mb-10 flex justify-between items-end">
+<div>
+<h1 class="font-headline font-extrabold text-4xl tracking-tight text-primary mb-2">Configure Package</h1>
+<p class="text-secondary opacity-70">Design a new curated wellness package for your students.</p>
+</div>
+<div class="flex items-center gap-3 bg-surface-container-low px-4 py-2 rounded-full">
+<span class="text-xs font-bold text-secondary uppercase tracking-tighter">Status:</span>
+<div class="flex items-center gap-2">
+<span class="text-xs font-semibold text-on-tertiary-container">Active</span>
+<div class="w-10 h-5 bg-on-tertiary-container/20 rounded-full relative cursor-pointer">
+<div class="absolute right-1 top-1 w-3 h-3 bg-on-tertiary-container rounded-full"></div>
+</div>
+</div>
+</div>
+</header>
+<form class="space-y-8">
+<!-- Section: Core Details -->
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0px_20px_40px_rgba(25,28,29,0.03)] flex flex-col gap-8">
+<!-- Package Name -->
+<div class="group">
+<label class="block text-xs font-bold text-secondary uppercase tracking-widest mb-3">Package Name</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl px-4 py-4 text-primary focus:ring-2 focus:ring-on-tertiary-container transition-all" placeholder="e.g. Introductory Reformer Bundle" type="text" value="Curated Pilates Flow"/>
+</div>
+<div class="grid grid-cols-2 gap-8">
+<!-- Session Count Stepper -->
+<div>
+<label class="block text-xs font-bold text-secondary uppercase tracking-widest mb-3">Session Count</label>
+<div class="flex items-center bg-surface-container-low rounded-xl p-1">
+<button class="w-12 h-12 flex items-center justify-center text-primary hover:bg-surface-container-high rounded-lg transition-colors" type="button">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<input class="flex-1 bg-transparent border-none text-center font-headline font-bold text-lg text-primary focus:ring-0" type="number" value="10"/>
+<button class="w-12 h-12 flex items-center justify-center text-primary hover:bg-surface-container-high rounded-lg transition-colors" type="button">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+<!-- Validity Period -->
+<div>
+<label class="block text-xs font-bold text-secondary uppercase tracking-widest mb-3">Validity Period</label>
+<div class="relative">
+<select class="w-full bg-surface-container-low border-none rounded-xl px-4 py-4 text-primary appearance-none focus:ring-2 focus:ring-on-tertiary-container">
+<option>30 Days</option>
+<option selected="">90 Days</option>
+<option>180 Days</option>
+<option>1 Year</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-4 text-secondary pointer-events-none">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Price Section -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
+<div>
+<label class="block text-xs font-bold text-secondary uppercase tracking-widest mb-3">Price (THB)</label>
+<div class="relative">
+<span class="absolute left-4 top-4 font-bold text-secondary/40">฿</span>
+<input class="w-full bg-surface-container-low border-none rounded-xl pl-10 pr-4 py-4 text-primary font-headline font-bold text-xl focus:ring-2 focus:ring-on-tertiary-container" type="text" value="8,500"/>
+</div>
+</div>
+<div class="pb-4">
+<p class="text-xs text-secondary/60 italic leading-snug">Calculated at ฿850 per session. Competitive for premium boutique standard.</p>
+</div>
+</div>
+</div>
+<!-- Section: Availability -->
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0px_20px_40px_rgba(25,28,29,0.03)]">
+<label class="block text-xs font-bold text-secondary uppercase tracking-widest mb-6">Branch Availability</label>
+<div class="flex flex-wrap gap-4">
+<!-- Selected Chips -->
+<div class="flex items-center gap-2 bg-on-tertiary-container text-white px-5 py-2.5 rounded-full font-semibold text-sm cursor-pointer shadow-md">
+<span>Pattaya</span>
+<span class="material-symbols-outlined text-sm">check_circle</span>
+</div>
+<div class="flex items-center gap-2 bg-on-tertiary-container text-white px-5 py-2.5 rounded-full font-semibold text-sm cursor-pointer shadow-md">
+<span>Chachoengsao</span>
+<span class="material-symbols-outlined text-sm">check_circle</span>
+</div>
+<!-- Unselected Chip -->
+<div class="flex items-center gap-2 bg-surface-container-high text-secondary/50 px-5 py-2.5 rounded-full font-semibold text-sm cursor-pointer hover:bg-surface-container-highest transition-colors">
+<span>Kanchanaburi</span>
+<span class="material-symbols-outlined text-sm">add</span>
+</div>
+</div>
+</div>
+<!-- Action Tray -->
+<div class="flex items-center justify-end gap-6 pt-6">
+<button class="text-secondary font-bold text-sm hover:underline hover:text-primary transition-colors" type="button">
+                            Cancel
+                        </button>
+<button class="bg-primary text-white px-10 py-4 rounded-xl font-headline font-extrabold text-base shadow-xl hover:shadow-2xl transition-all hover:-translate-y-0.5 active:translate-y-0 active:scale-95" type="submit">
+                            Confirm &amp; Save Package
+                        </button>
+</div>
+</form>
+<!-- Footer Aesthetic -->
+<footer class="mt-24 py-12 border-t border-outline-variant/10 flex justify-between items-center opacity-40">
+<span class="text-xs font-bold uppercase tracking-widest">© 2024 The Mindful Curator</span>
+<div class="flex gap-8">
+<span class="text-xs font-bold uppercase tracking-widest">System Stability: 99.9%</span>
+<span class="text-xs font-bold uppercase tracking-widest">Last Modified: 14:02 PM</span>
+</div>
+</footer>
+</div>
+</main>
+</div>
+<!-- Background Decorative Element (Editorial Feel) -->
+<div class="fixed bottom-0 right-0 -z-10 opacity-[0.03] select-none pointer-events-none p-12">
+<h1 class="font-headline font-extrabold text-[20rem] leading-none tracking-tighter">FLOW</h1>
+</div>
+</body></html>

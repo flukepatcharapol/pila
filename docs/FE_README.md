@@ -134,7 +134,7 @@ nano .env.local
 ```env
 # URL ของ BE API server
 # ระหว่าง development ใช้ localhost
-VITE_API_URL=http://localhost:8000
+VITE_API_BASE_URL=http://localhost:8000
 
 # ชื่อแอพ (แสดงใน browser tab)
 VITE_APP_NAME=Studio Management
@@ -280,7 +280,7 @@ npm run dev -- --port 3000
 # ตรวจสอบว่า BE server รันอยู่
 curl http://localhost:8000/health
 
-# ตรวจสอบ VITE_API_URL ใน .env.local
+# ตรวจสอบ VITE_API_BASE_URL ใน .env.local
 cat .env.local
 ```
 

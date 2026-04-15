@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Settings - The Mindful Curator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#191c1d",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#395f94",
+                        "surface-tint": "#4e6073",
+                        "on-tertiary-container": "#54b6b5",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed-variant": "#36485b",
+                        "on-surface": "#191c1d",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f2f4f5",
+                        "on-surface-variant": "#43474c",
+                        "on-secondary-fixed": "#001c3b",
+                        "on-secondary-fixed-variant": "#1e477b",
+                        "primary": "#162839",
+                        "tertiary-fixed": "#93f2f2",
+                        "surface-container-high": "#e6e8e9",
+                        "inverse-surface": "#2e3132",
+                        "surface-container-highest": "#e1e3e4",
+                        "tertiary-container": "#004444",
+                        "background": "#f8fafb",
+                        "tertiary": "#002c2c",
+                        "surface-variant": "#e1e3e4",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed-variant": "#004f4f",
+                        "on-primary-fixed": "#091d2e",
+                        "surface-bright": "#f8fafb",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-container": "#96a9be",
+                        "inverse-primary": "#b5c8df",
+                        "inverse-on-surface": "#eff1f2",
+                        "tertiary-fixed-dim": "#76d6d5",
+                        "outline-variant": "#c4c6cd",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#d1e4fb",
+                        "outline": "#74777d",
+                        "on-secondary-container": "#284f83",
+                        "surface-dim": "#d8dadb",
+                        "surface-container": "#eceeef",
+                        "secondary-container": "#9ec2fe",
+                        "surface": "#f8fafb",
+                        "secondary-fixed-dim": "#a7c8ff",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed": "#002020",
+                        "primary-container": "#2c3e50",
+                        "primary-fixed-dim": "#b5c8df",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#d5e3ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#f8fafb]/80 dark:bg-[#162839]/80 backdrop-blur-xl shadow-sm dark:shadow-none flex justify-between items-center px-8 h-20 w-full font-manrope tracking-tight">
+<div class="flex items-center gap-4">
+<span class="text-2xl font-bold text-[#162839] dark:text-[#f8fafb]">The Mindful Curator</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4 text-[#395f94] dark:text-[#f2f4f5]">
+<span class="material-symbols-outlined hover:opacity-80 transition-opacity cursor-pointer scale-95 duration-200" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined text-[#54b6b5] font-semibold transition-opacity cursor-pointer scale-95 duration-200" data-icon="settings">settings</span>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="Close up professional portrait of a man with short hair and clean shave looking directly at camera with friendly expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzuKLu2PshXCzfYoC-plCJRszf22fTvEJ9x9DbqHQBDruIBnbUCtvjzweSTgXyLLHQotJOIM8aWkExLS_XevcU2XuTBIm2qnuhmRVKeaWyJ3bbfWV8laXok7VlEiwLtoUXzmoRRiIXBdkqRRgbEMpkxmlewktjwVGnmP3nXOtwjqihWriKPrn_VDb1GhU3_EzyD4YbGXOX2nMXQ3gLT0zsm6xlzKCp4LF7gmk-2KPIn6iJo1n7UndaXCwcTRws_v3yLZo3cYhZzA"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-[#f2f4f5] dark:bg-[#162839] flex flex-col pt-24 pb-8 z-40 hidden md:flex">
+<div class="px-8 mb-8">
+<h2 class="font-manrope font-extrabold text-[#162839] dark:text-white text-lg">The Mindful Curator</h2>
+<p class="text-xs text-secondary opacity-70">Management Suite</p>
+</div>
+<nav class="flex-1 overflow-y-auto space-y-1">
+<a class="flex items-center gap-3 text-[#395f94] dark:text-[#e6e8e9] ml-4 pl-4 py-3 hover:text-[#54b6b5] transition-colors translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-inter text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 text-[#395f94] dark:text-[#e6e8e9] ml-4 pl-4 py-3 hover:text-[#54b6b5] transition-colors translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="event_repeat">event_repeat</span>
+<span class="font-inter text-sm">Customer Session</span>
+</a>
+<a class="flex items-center gap-3 text-[#395f94] dark:text-[#e6e8e9] ml-4 pl-4 py-3 hover:text-[#54b6b5] transition-colors translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-inter text-sm">Booking</span>
+</a>
+<a class="flex items-center gap-3 text-[#395f94] dark:text-[#e6e8e9] ml-4 pl-4 py-3 hover:text-[#54b6b5] transition-colors translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-inter text-sm">Customer</span>
+</a>
+<a class="flex items-center gap-3 text-[#395f94] dark:text-[#e6e8e9] ml-4 pl-4 py-3 hover:text-[#54b6b5] transition-colors translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+<span class="font-inter text-sm">Order</span>
+</a>
+<a class="flex items-center gap-3 text-[#395f94] dark:text-[#e6e8e9] ml-4 pl-4 py-3 hover:text-[#54b6b5] transition-colors translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-inter text-sm">Signature Print</span>
+</a>
+<a class="flex items-center gap-3 text-[#395f94] dark:text-[#e6e8e9] ml-4 pl-4 py-3 hover:text-[#54b6b5] transition-colors translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="person_pin">person_pin</span>
+<span class="font-inter text-sm">Trainer</span>
+</a>
+<a class="flex items-center gap-3 text-[#395f94] dark:text-[#e6e8e9] ml-4 pl-4 py-3 hover:text-[#54b6b5] transition-colors translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
+<span class="font-inter text-sm">Consultant</span>
+</a>
+<a class="flex items-center gap-3 text-[#395f94] dark:text-[#e6e8e9] ml-4 pl-4 py-3 hover:text-[#54b6b5] transition-colors translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-inter text-sm">Package</span>
+</a>
+<a class="flex items-center gap-3 text-[#395f94] dark:text-[#e6e8e9] ml-4 pl-4 py-3 hover:text-[#54b6b5] transition-colors translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="contact_page">contact_page</span>
+<span class="font-inter text-sm">User</span>
+</a>
+<a class="flex items-center gap-3 text-[#395f94] dark:text-[#e6e8e9] ml-4 pl-4 py-3 hover:text-[#54b6b5] transition-colors translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+<span class="font-inter text-sm">Branch</span>
+</a>
+<a class="flex items-center gap-3 text-[#395f94] dark:text-[#e6e8e9] ml-4 pl-4 py-3 hover:text-[#54b6b5] transition-colors translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="lock_person">lock_person</span>
+<span class="font-inter text-sm">Permission</span>
+</a>
+<!-- Active Item: Setting -->
+<a class="flex items-center gap-3 text-[#162839] dark:text-[#54b6b5] font-bold bg-[#ffffff] dark:bg-[#395f94]/20 rounded-l-full ml-4 pl-4 py-3 transition-colors translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-inter text-sm">Setting</span>
+</a>
+<a class="flex items-center gap-3 text-[#395f94] dark:text-[#e6e8e9] ml-4 pl-4 py-3 hover:text-[#54b6b5] transition-colors translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-inter text-sm">Help</span>
+</a>
+</nav>
+<div class="mt-auto px-4">
+<button class="flex items-center gap-3 text-error w-full ml-4 pl-4 py-3 hover:opacity-70 transition-opacity">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-inter text-sm">Log Out</span>
+</button>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="md:ml-64 pt-28 px-8 pb-12 min-h-screen">
+<div class="max-w-5xl mx-auto">
+<!-- Header Section -->
+<div class="mb-12">
+<h1 class="text-5xl font-extrabold tracking-tighter text-primary mb-2">Settings</h1>
+<p class="text-secondary font-body text-lg max-w-xl opacity-80">Configure your studio environment and personal preferences to optimize your daily workflow.</p>
+</div>
+<!-- Bento Grid Layout: Simplified to Preferences only -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<!-- Preferences - Interactive Section -->
+<section class="md:col-span-12 grid grid-cols-1 gap-8 md:grid-cols-1">
+<!-- Language Selection -->
+<div class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/15">
+<div class="flex items-center gap-4 mb-8">
+<span class="material-symbols-outlined text-tertiary-container" data-icon="translate">translate</span>
+<h4 class="text-xl font-bold text-primary">Language Preference</h4>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<button class="flex items-center justify-between p-5 rounded-xl border-2 border-primary bg-primary/5 group transition-all">
+<div class="flex items-center gap-3">
+<img alt="UK Flag" class="w-6 h-4 rounded shadow-sm" data-alt="Small stylized icon of the British Union Jack flag with clean edges" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-ukfGmWGNcAshzD3EMvEprgx0ixpmleTfgPgGIKpHTyu00wamjfHQIXXH9o2KD4bRoTuk90eTjFNriaBZx7wZ1AOauAodyvrQZ9xyAJTiVfF6qtnTqVh8dR3VbBrL8gbYc-hT4lDTwqLe-POI57e050c00Kyt6nwolO2rvAXysEEqT25dxrZNwYLnDBW94DYbkBQq-0NvSY5P0ZhVwTyFUBCM5OnqRLLQLYvHL4nUXtqoMzQYUINzKcUHkSDHBkMucPx96AM1mg"/>
+<span class="font-bold text-primary">English</span>
+</div>
+<span class="material-symbols-outlined text-primary" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</button>
+<button class="flex items-center justify-between p-5 rounded-xl border-2 border-transparent bg-surface-container-low hover:bg-surface-container-high transition-all">
+<div class="flex items-center gap-3">
+<img alt="Thai Flag" class="w-6 h-4 rounded shadow-sm" data-alt="Small stylized icon of the Thai national flag with red white and blue stripes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnvhppD4EMIJpwAv2iizM9edFYUEFQZWydkfGe9Jmvgc_uGR7u92ust2a9QPCLf_k1j2yEi_LM_7BcJEzmTPHU5csP_42ca6-Y_TODB6vqT3AgSpG9K_DtofzXMuTzu8aUaneggMgcYHoRCn_6Fm27kQ4F_c4AIjJC4duG96cX-8J77WzRSBy0X6dtoh8KmolF5URI-hscgZ9Yb7qemK6KaMcUvnoxkhQMv55Lm-4O4ZxL0qo5ACbC7lVEuX2KV0eItm5TO2oEDg"/>
+<span class="font-medium text-secondary">Thai</span>
+</div>
+</button>
+</div>
+</div>
+<!-- Theme Preference -->
+<div class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/15 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-secondary" data-icon="palette">palette</span>
+<h4 class="text-xl font-bold text-primary">Theme Appearance</h4>
+</div>
+<span class="text-xs font-bold px-3 py-1 bg-surface-container-high text-outline rounded-full">Current: Light</span>
+</div>
+<p class="text-sm text-secondary mb-8">Toggle between light and dark modes to adjust your visual environment based on your studio's lighting.</p>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="dark_mode">dark_mode</span>
+<span class="font-bold text-primary">Dark Mode</span>
+</div>
+<!-- Custom Toggle Switch -->
+<div class="relative inline-flex items-center cursor-pointer">
+<div class="w-14 h-8 bg-outline-variant/30 rounded-full transition-colors"></div>
+<div class="absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-200 translate-x-0"></div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md z-50 flex justify-around items-center px-4 h-20 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+<button class="flex flex-col items-center gap-1 text-secondary opacity-50">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-[10px] font-medium">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-secondary opacity-50">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="text-[10px] font-medium">Bookings</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined" data-icon="settings" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="text-[10px] font-bold">Settings</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-secondary opacity-50">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="text-[10px] font-medium">Clients</span>
+</button>
+</nav>
+</body></html>

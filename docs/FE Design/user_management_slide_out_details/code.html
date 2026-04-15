@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>User Management - The Mindful Curator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#b5c8df",
+                    "primary-container": "#2c3e50",
+                    "outline": "#74777d",
+                    "on-primary-fixed": "#091d2e",
+                    "primary": "#162839",
+                    "on-primary": "#ffffff",
+                    "on-secondary-fixed-variant": "#1e477b",
+                    "surface-variant": "#e1e3e4",
+                    "surface-dim": "#d8dadb",
+                    "on-tertiary-fixed-variant": "#004f4f",
+                    "tertiary-fixed-dim": "#76d6d5",
+                    "secondary": "#395f94",
+                    "on-primary-container": "#96a9be",
+                    "surface-container-high": "#e6e8e9",
+                    "on-error": "#ffffff",
+                    "secondary-fixed": "#d5e3ff",
+                    "inverse-on-surface": "#eff1f2",
+                    "secondary-fixed-dim": "#a7c8ff",
+                    "secondary-container": "#9ec2fe",
+                    "on-background": "#191c1d",
+                    "error-container": "#ffdad6",
+                    "tertiary-container": "#004444",
+                    "surface-tint": "#4e6073",
+                    "on-secondary-container": "#284f83",
+                    "inverse-surface": "#2e3132",
+                    "tertiary": "#002c2c",
+                    "on-error-container": "#93000a",
+                    "surface-bright": "#f8fafb",
+                    "on-tertiary-container": "#54b6b5",
+                    "on-surface-variant": "#43474c",
+                    "outline-variant": "#c4c6cd",
+                    "on-secondary-fixed": "#001c3b",
+                    "on-surface": "#191c1d",
+                    "inverse-primary": "#b5c8df",
+                    "primary-fixed": "#d1e4fb",
+                    "on-primary-fixed-variant": "#36485b",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed": "#93f2f2",
+                    "surface-container-low": "#f2f4f5",
+                    "surface": "#f8fafb",
+                    "surface-container-highest": "#e1e3e4",
+                    "background": "#f8fafb",
+                    "on-tertiary-fixed": "#002020",
+                    "error": "#ba1a1a",
+                    "surface-container": "#eceeef",
+                    "on-secondary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e1e3e4; border-radius: 10px; }
+        
+        /* Drawer Transition Logic */
+        #user-drawer {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #user-drawer.translate-x-full {
+            transform: translateX(100%);
+        }
+        #user-drawer.translate-x-0 {
+            transform: translateX(0);
+        }
+        #overlay {
+            transition: opacity 0.3s ease-in-out;
+            pointer-events: none;
+        }
+        #overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body class="bg-surface-container-low text-on-surface overflow-x-hidden">
+<!-- Overlay for Slide-out Drawer -->
+<div class="fixed inset-0 bg-black/20 z-[45] opacity-0 transition-opacity" id="overlay"></div>
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 overflow-y-auto bg-[#f2f4f5] dark:bg-slate-900 flex flex-col py-8 pl-6 gap-y-1">
+<div class="mb-10 pr-6">
+<h1 class="text-2xl font-bold tracking-tighter text-[#162839] dark:text-white">The Mindful Curator</h1>
+<p class="text-[10px] uppercase tracking-[0.2em] text-slate-500 mt-1">Pilates Command Center</p>
+</div>
+<nav class="flex flex-col gap-y-1 pr-4">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-[#395f94] transition-colors font-manrope tracking-tight font-medium text-sm" href="#">
+<span class="material-symbols-outlined">dashboard</span> Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-[#395f94] transition-colors font-manrope tracking-tight font-medium text-sm" href="#">
+<span class="material-symbols-outlined">event_seat</span> Customer Session
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-[#395f94] transition-colors font-manrope tracking-tight font-medium text-sm" href="#">
+<span class="material-symbols-outlined">calendar_today</span> Booking
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-[#395f94] transition-colors font-manrope tracking-tight font-medium text-sm" href="#">
+<span class="material-symbols-outlined">group</span> Customer
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-[#395f94] transition-colors font-manrope tracking-tight font-medium text-sm" href="#">
+<span class="material-symbols-outlined">shopping_cart</span> Order
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-[#395f94] transition-colors font-manrope tracking-tight font-medium text-sm" href="#">
+<span class="material-symbols-outlined">article</span> Signature Print
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-[#395f94] transition-colors font-manrope tracking-tight font-medium text-sm" href="#">
+<span class="material-symbols-outlined">person_pin</span> Trainer
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-[#395f94] transition-colors font-manrope tracking-tight font-medium text-sm" href="#">
+<span class="material-symbols-outlined">support_agent</span> Consultant
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-[#395f94] transition-colors font-manrope tracking-tight font-medium text-sm" href="#">
+<span class="material-symbols-outlined">inventory_2</span> Package
+            </a>
+<!-- Active Tab: User -->
+<a class="flex items-center gap-3 px-4 py-3 text-[#162839] dark:text-white font-bold bg-white dark:bg-slate-800 rounded-l-full translate-x-2 transition-all font-manrope tracking-tight text-sm" href="#">
+<span class="material-symbols-outlined">assignment_ind</span> User
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-[#395f94] transition-colors font-manrope tracking-tight font-medium text-sm" href="#">
+<span class="material-symbols-outlined">store</span> Branch
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-[#395f94] transition-colors font-manrope tracking-tight font-medium text-sm" href="#">
+<span class="material-symbols-outlined">lock_person</span> Permission
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-[#395f94] transition-colors font-manrope tracking-tight font-medium text-sm" href="#">
+<span class="material-symbols-outlined">settings</span> Setting
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-[#395f94] transition-colors font-manrope tracking-tight font-medium text-sm" href="#">
+<span class="material-symbols-outlined">help</span> Help
+            </a>
+</nav>
+<div class="mt-auto pr-6 pb-4">
+<button class="w-full bg-primary text-on-primary py-4 px-6 rounded-xl flex items-center justify-center gap-2 font-bold transition-all scale-95 active:scale-90 duration-200 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">add_circle</span>
+                New Session
+            </button>
+</div>
+</aside>
+<!-- TopAppBar -->
+<header class="fixed top-0 right-0 left-64 h-16 z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl flex items-center justify-between px-8 w-full">
+<div class="flex items-center gap-4">
+<h2 class="font-manrope font-semibold text-primary text-xl">User Management</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container rounded-full border-none text-sm focus:ring-2 focus:ring-secondary/20 w-64" placeholder="Search members..." type="text"/>
+</div>
+<div class="flex items-center gap-4 border-l border-surface-container-highest pl-6">
+<button class="text-slate-400 hover:text-[#54b6b5] transition-all duration-300">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-slate-400 hover:text-[#54b6b5] transition-all duration-300">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+<img alt="Manager Profile" class="w-8 h-8 rounded-full border-2 border-surface-container-high object-cover" data-alt="close-up portrait of a professional studio manager with a friendly expression in a brightly lit modern office environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIpXrNzRDz-s8uAvsFkKTtDv93u4o5-uz3P-09nVjAim3ovnX-akAqY_s72FFeNbujc92tNX_FKDE9180UahIfXmYvNbVJ4vA8w3sYK21mmhP8n0PFVkV-0OUalIgJ1PrLR2pAwZeU4rlyDfertoZKEHZSL0DePWrWgVjsDMeYqE35maASJzzPj9SY7qkxNdZnj6l7x-ody8iVM8hPt7vWiCNd_KXzTAyWJcmsfNtnWHpoUITEtVcU8GpBO6ydjkZWL6I1a_X-mw"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-64 pt-24 pb-12 px-8 flex gap-8">
+<!-- User List Canvas (Now Full Width) -->
+<div class="flex-1 w-full">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h3 class="text-3xl font-bold tracking-tight text-primary">Team Directory</h3>
+<p class="text-on-surface-variant mt-1">Manage studio access and administrative roles.</p>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-white px-6 py-3 rounded-xl font-bold shadow-xl shadow-primary/10 flex items-center gap-2 hover:-translate-y-0.5 transition-all" onclick="toggleDrawer()">
+<span class="material-symbols-outlined">person_add</span>
+                    New User
+                </button>
+</div>
+<!-- Table Container -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-primary font-manrope text-sm uppercase tracking-widest border-b border-surface-container">
+<th class="px-8 py-5 font-semibold">User Profile</th>
+<th class="px-6 py-5 font-semibold">Contact Info</th>
+<th class="px-6 py-5 font-semibold">Role</th>
+<th class="px-8 py-5 font-semibold text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container">
+<!-- User Row 1 -->
+<tr class="group hover:bg-surface-container-low/50 transition-colors">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<img alt="Anya Miller" class="w-12 h-12 rounded-full object-cover ring-2 ring-surface-container-high" data-alt="professional portrait of a woman with short dark hair wearing a minimalist white shirt against a neutral studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuArNy-xSAYs-f043eEaFpdUA3ZsngnN7UbFrlP9TsS2VccCTUKgpltJcbtp9rqjOCWYwj4rAk5_g53yw2jdL2Z3VrsaPeDVkt1H-de0KZZk-wAZEZId2YbTg3P8kgCt-fTFEi9YfBBL8bOA9_EdjODrKpIRiyehoz98xKNp9I-piDDDWqzbvxgU-6n1LjNIvpFlkJrREVTECef9f1EXOdmTA9q1IHstE0yrrdUo2kRA8YeifY3Lrn_JGC7v0VOAAwZDU-D0KTEMIQ"/>
+<div>
+<div class="font-manrope font-bold text-primary">Anya Miller</div>
+<div class="text-xs text-on-surface-variant font-medium tracking-wide">ID: CUR-8821</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-6">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2 text-sm text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-secondary">mail</span>
+                                        anya.m@mindfulcurator.com
+                                    </div>
+<div class="flex items-center gap-2 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-secondary">call</span>
+                                        +1 415-555-0123
+                                    </div>
+</div>
+</td>
+<td class="px-6 py-6">
+<span class="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed text-[10px] font-bold uppercase tracking-wider rounded-full">Owner</span>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="p-2 hover:bg-surface-container rounded-full text-secondary transition-colors" onclick="toggleDrawer()">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 hover:bg-error-container hover:text-error rounded-full text-slate-400 transition-colors ml-2">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</td>
+</tr>
+<!-- User Row 2 -->
+<tr class="group hover:bg-surface-container-low/50 transition-colors">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<img alt="Julian Lee" class="w-12 h-12 rounded-full object-cover ring-2 ring-surface-container-high" data-alt="close up of a stylish young man with glasses and a friendly smile in a professional studio setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNb5QLuJTHm3fzLj6uDSTckYyNFBfx4kqtr8a0779ZyHXz0H7ugvgnLsjB1Dh34-2t_YeST0T9JsOKqlPd5I1gg7JvWG-2saeUY0IqGt43sxTL07bVXP8Z9M_Prd424CxxCrtZqDRDoSwxezvTV3y0G4xRu_PxLLdApLDPXAiFyPbBL2ENm3lQiSknM42iAAwgae9RJYBFtl6rOZGWJZQEOWiqXCYLrouxsou2P7DCDVHAHwZAntZZUbJxQMqYIbToiVsyPqY3Xw"/>
+<div>
+<div class="font-manrope font-bold text-primary">Julian Lee</div>
+<div class="text-xs text-on-surface-variant font-medium tracking-wide">ID: CUR-1249</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-6">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2 text-sm text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-secondary">mail</span>
+                                        jlee@mindfulcurator.com
+                                    </div>
+<div class="flex items-center gap-2 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-secondary">call</span>
+                                        +1 415-555-9872
+                                    </div>
+</div>
+</td>
+<td class="px-6 py-6">
+<span class="px-3 py-1 bg-primary-fixed text-on-primary-fixed text-[10px] font-bold uppercase tracking-wider rounded-full">Master</span>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="p-2 hover:bg-surface-container rounded-full text-secondary transition-colors" onclick="toggleDrawer()">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 hover:bg-error-container hover:text-error rounded-full text-slate-400 transition-colors ml-2">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</td>
+</tr>
+<!-- User Row 3 -->
+<tr class="group hover:bg-surface-container-low/50 transition-colors">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<img alt="Sarah Kim" class="w-12 h-12 rounded-full object-cover ring-2 ring-surface-container-high" data-alt="portrait of a focused woman with a ponytail in athletic wear posing in a clean minimalist pilates studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCStGywvhQxxrT69rjy4H-mXMLUSsbFWCiNTV3Y-0G_rnl6ZNxiMoS41a7sQQVz3qV_LLLUVQU3b-Ih_4rB7pL6EXMroYknIwb2Oj7JENF3L0leHOyAKnA18wnqRNaB9Z5VWC6OCcKJKTejGbrBnWi2X5Ddwc_gT9Fk3_pqwHBpSclhq6Gr92vhFhlmH--YexfTi14poDW4idlWkuMw0KXU1gfdDsZKBB8Ts5jLHLamvLMmWvvYEtjnAhzlAOEc17wYzok-7_ganQ"/>
+<div>
+<div class="font-manrope font-bold text-primary">Sarah Kim</div>
+<div class="text-xs text-on-surface-variant font-medium tracking-wide">ID: CUR-9304</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-6">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2 text-sm text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-secondary">mail</span>
+                                        s.kim@mindfulcurator.com
+                                    </div>
+<div class="flex items-center gap-2 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-secondary">call</span>
+                                        +1 415-555-4421
+                                    </div>
+</div>
+</td>
+<td class="px-6 py-6">
+<span class="px-3 py-1 bg-secondary-fixed text-on-secondary-fixed text-[10px] font-bold uppercase tracking-wider rounded-full">Admin</span>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="p-2 hover:bg-surface-container rounded-full text-secondary transition-colors" onclick="toggleDrawer()">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 hover:bg-error-container hover:text-error rounded-full text-slate-400 transition-colors ml-2">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="px-8 py-5 bg-surface border-t border-surface-container flex items-center justify-between">
+<span class="text-xs text-on-surface-variant font-medium">Showing 3 of 12 team members</span>
+<div class="flex gap-2">
+<button class="p-2 rounded-lg border border-surface-container-highest hover:bg-surface-container transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="p-2 rounded-lg border border-surface-container-highest hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Detail Drawer (Slide-out) -->
+<aside class="fixed top-0 right-0 h-screen w-[420px] bg-white z-50 shadow-2xl translate-x-full overflow-y-auto" id="user-drawer">
+<div class="p-8">
+<div class="flex items-center justify-between mb-8">
+<h4 class="font-manrope font-bold text-xl text-primary">User Details</h4>
+<button class="p-2 hover:bg-surface-container rounded-full text-slate-300 hover:text-primary transition-colors" onclick="toggleDrawer()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<form class="space-y-6">
+<!-- Profile Image Uploader -->
+<div class="flex flex-col items-center justify-center py-8 border-2 border-dashed border-surface-container-highest rounded-2xl bg-surface-container-low group cursor-pointer hover:border-secondary transition-colors">
+<div class="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-md mb-4 ring-4 ring-white">
+<span class="material-symbols-outlined text-4xl text-slate-300 group-hover:text-secondary transition-colors">add_a_photo</span>
+</div>
+<p class="text-[11px] font-bold uppercase tracking-widest text-slate-400 group-hover:text-primary transition-colors">Upload Profile Photo</p>
+</div>
+<!-- Input Fields -->
+<div class="space-y-5">
+<div class="space-y-1.5">
+<label class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant ml-1">Full Name</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-secondary/20 placeholder:text-slate-300 text-sm" placeholder="e.g. John Doe" type="text"/>
+</div>
+<div class="space-y-1.5">
+<label class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant ml-1">Assigned Role</label>
+<div class="relative">
+<select class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-secondary/20 appearance-none text-on-surface text-sm">
+<option>Admin</option>
+<option>Master</option>
+<option>Owner</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">expand_more</span>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant ml-1">Phone Number</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-secondary/20 placeholder:text-slate-300 text-sm" placeholder="+1 (000) 000-0000" type="tel"/>
+</div>
+<div class="space-y-1.5">
+<label class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant ml-1">Email Address</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3.5 focus:ring-2 focus:ring-secondary/20 placeholder:text-slate-300 text-sm" placeholder="name@mindfulcurator.com" type="email"/>
+</div>
+</div>
+<div class="pt-8 border-t border-surface-container flex gap-3">
+<button class="flex-1 py-4 bg-surface-container text-primary font-bold rounded-xl hover:bg-surface-container-high transition-colors text-sm" onclick="toggleDrawer()" type="button">
+                    Cancel
+                </button>
+<button class="flex-1 py-4 bg-gradient-to-br from-secondary to-[#395f94] text-white font-bold rounded-xl shadow-lg shadow-secondary/20 hover:-translate-y-0.5 transition-all text-sm" type="submit">
+                    Save User
+                </button>
+</div>
+</form>
+<div class="mt-8 p-5 bg-tertiary-container/5 rounded-2xl border border-tertiary-container/10">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-tertiary-container text-xl shrink-0">info</span>
+<div>
+<p class="text-xs font-bold text-on-tertiary-container mb-1">Administrative Access</p>
+<p class="text-[11px] text-on-tertiary-container/70 leading-relaxed">Changes to roles will take effect after the user re-authenticates their session next time.</p>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<script>
+    function toggleDrawer() {
+        const drawer = document.getElementById('user-drawer');
+        const overlay = document.getElementById('overlay');
+        const isClosed = drawer.classList.contains('translate-x-full');
+        
+        if (isClosed) {
+            drawer.classList.remove('translate-x-full');
+            drawer.classList.add('translate-x-0');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        } else {
+            drawer.classList.remove('translate-x-0');
+            drawer.classList.add('translate-x-full');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    }
+
+    // Close on overlay click
+    document.getElementById('overlay').addEventListener('click', toggleDrawer);
+</script>
+</body></html>
