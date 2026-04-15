@@ -34,12 +34,12 @@ class GoogleConnectRequest(BaseModel):
     token_expires_at: str   # ISO datetime string
 
 
-def _pref_to_dict(p: UserPreference) -> dict:
+def _pref_to_dict(preference: UserPreference) -> dict:
     return {
-        "user_id": str(p.user_id),
-        "language": p.language,
-        "dark_mode": p.dark_mode,
-        "updated_at": str(p.updated_at),
+        "user_id": str(preference.user_id),
+        "language": preference.language,
+        "dark_mode": preference.dark_mode,
+        "updated_at": str(preference.updated_at),
     }
 
 

@@ -146,6 +146,7 @@ export default function Pin() {
               </label>
               <input
                 id="pin"
+                data-testid="pin-input"
                 type="password"
                 inputMode="numeric"
                 pattern="[0-9]*"
@@ -173,6 +174,7 @@ export default function Pin() {
             {error && (
               <p
                 role="alert"
+                data-testid="pin-error"
                 style={{
                   color: 'var(--color-error, #b00020)',
                   fontSize: '0.875rem',
@@ -186,6 +188,8 @@ export default function Pin() {
             {/* Submit */}
             <button
               type="submit"
+              data-testid="pin-submit"
+              data-action="confirm-pin"
               disabled={isLoading || pin.length === 0}
               style={{
                 width: '100%',
@@ -208,6 +212,8 @@ export default function Pin() {
 
           {/* Back to login */}
           <button
+            data-testid="back-to-login"
+            data-action="back-to-login"
             onClick={() => {
               clearAllTokens();
               navigate('/login');

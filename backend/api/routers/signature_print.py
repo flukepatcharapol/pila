@@ -25,14 +25,14 @@ class GenerateRequest(BaseModel):
     order_id: str
 
 
-def _file_to_dict(f: SignaturePrintFile) -> dict:
+def _file_to_dict(signature_file: SignaturePrintFile) -> dict:
     return {
-        "id": str(f.id),
-        "order_id": str(f.order_id),
-        "file_url": f.file_url,
-        "file_id": f.file_id,
-        "generated_by": str(f.generated_by) if f.generated_by else None,
-        "created_at": str(f.created_at),
+        "id": str(signature_file.id),
+        "order_id": str(signature_file.order_id),
+        "file_url": signature_file.file_url,
+        "file_id": signature_file.file_id,
+        "generated_by": str(signature_file.generated_by) if signature_file.generated_by else None,
+        "created_at": str(signature_file.created_at),
     }
 
 
@@ -99,7 +99,7 @@ def list_signature_prints(
     if order_id:
         query = query.filter_by(order_id=order_id)
     items = query.order_by(SignaturePrintFile.created_at.desc()).all()
-    return {"items": [_file_to_dict(f) for f in items], "total": len(items)}
+    return {"items": [_file_to_dict(signature_file) for signature_file in items], "total": len(items)}
 
 
 @router.get("/signature-print/storage")
@@ -144,7 +144,7 @@ def get_signature(
     current_user: dict = Depends(require_pin_verified),
     db: Session = Depends(get_db),
 ):
-    f = db.query(SignaturePrintFile).filter_by(id=signature_id).first()
-    if not f:
+    signature_file = db.query(SignaturePrintFile).filter_by(id=signature_id).first()
+    if not signature_file:
         raise HTTPException(status_code=404, detail="File not found")
-    return _file_to_dict(f)
+    return _file_to_dict(signature_file)

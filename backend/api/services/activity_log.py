@@ -9,12 +9,12 @@ from sqlalchemy.orm import Session
 from api.models.activity_log import ActivityLog
 
 
-def _to_uuid(val) -> uuid.UUID | None:
+def _to_uuid(raw_value) -> uuid.UUID | None:
     """แปลง string/UUID → uuid.UUID, คืน None ถ้าค่าเป็น None หรือ empty"""
-    if not val:
+    if not raw_value:
         return None
     try:
-        return uuid.UUID(str(val))
+        return uuid.UUID(str(raw_value))
     except (ValueError, AttributeError):
         return None
 

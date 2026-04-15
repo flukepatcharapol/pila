@@ -10,11 +10,11 @@ from api.models.package import Package
 from api.services.permissions import check_permission
 
 
-def _to_uuid(val) -> uuid.UUID | None:
-    if not val:
+def _to_uuid(raw_value) -> uuid.UUID | None:
+    if not raw_value:
         return None
     try:
-        return uuid.UUID(str(val))
+        return uuid.UUID(str(raw_value))
     except (ValueError, AttributeError):
         return None
 
@@ -66,7 +66,12 @@ def list_orders(current_user: dict, db: Session, page: int = 1, page_size: int =
         query = query.filter(Order.customer_id == _to_uuid(customer_id))
     total = query.count()
     items = query.offset((page - 1) * page_size).limit(page_size).all()
-    return {"items": [_order_to_dict(o) for o in items], "total": total, "page": page, "page_size": page_size}
+    return {
+        "items": [_order_to_dict(order) for order in items],
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+    }
 
 
 def get_order(order_id: uuid.UUID, current_user: dict, db: Session) -> dict:

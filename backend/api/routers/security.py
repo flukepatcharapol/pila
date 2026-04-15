@@ -53,4 +53,9 @@ def list_active_sessions(
     except (ValueError, KeyError):
         raise HTTPException(status_code=401, detail="Invalid user context")
     sessions = db.query(UserSession).filter_by(user_id=user_id, is_active=True).all()
-    return {"sessions": [{"jti": s.token_jti, "created_at": str(s.created_at)} for s in sessions]}
+    return {
+        "sessions": [
+            {"jti": session.token_jti, "created_at": str(session.created_at)}
+            for session in sessions
+        ]
+    }

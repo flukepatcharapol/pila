@@ -50,6 +50,8 @@ export default function Dashboard() {
           Studio Management System
         </p>
         <button
+          data-testid="logout-btn"
+          data-action="logout"
           onClick={() => void handleLogout()}
           style={{
             padding: '0.625rem 1.5rem',

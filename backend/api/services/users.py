@@ -9,14 +9,14 @@ from api.services.activity_log import log as activity_log
 
 # Role hierarchy for access control
 ROLE_HIERARCHY = ["TRAINER", "ADMIN", "BRANCH_MASTER", "OWNER", "DEVELOPER"]
-ROLE_RANK = {r: i for i, r in enumerate(ROLE_HIERARCHY)}
+ROLE_RANK = {role: rank_index for rank_index, role in enumerate(ROLE_HIERARCHY)}
 
 
-def _to_uuid(val) -> uuid.UUID | None:
-    if not val:
+def _to_uuid(raw_value) -> uuid.UUID | None:
+    if not raw_value:
         return None
     try:
-        return uuid.UUID(str(val))
+        return uuid.UUID(str(raw_value))
     except (ValueError, AttributeError):
         return None
 
@@ -51,7 +51,12 @@ def list_users(current_user: dict, db: Session, page: int = 1, page_size: int = 
 
     total = query.count()
     items = query.offset((page - 1) * page_size).limit(page_size).all()
-    return {"items": [_user_to_dict(u) for u in items], "total": total, "page": page, "page_size": page_size}
+    return {
+        "items": [_user_to_dict(user) for user in items],
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+    }
 
 
 def get_user(user_id: uuid.UUID, current_user: dict, db: Session) -> dict:

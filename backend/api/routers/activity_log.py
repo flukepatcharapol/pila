@@ -43,16 +43,16 @@ def list_activity_log(
     return {
         "items": [
             {
-                "id": str(l.id),
-                "user_id": str(l.user_id) if l.user_id else None,
-                "action": l.action,
-                "target_id": l.target_id,
-                "target_type": l.target_type,
-                "detail": l.detail,
-                "created_at": str(l.created_at),
-                "timestamp": str(l.created_at),  # alias สำหรับ created_at
+                "id": str(log_entry.id),
+                "user_id": str(log_entry.user_id) if log_entry.user_id else None,
+                "action": log_entry.action,
+                "target_id": log_entry.target_id,
+                "target_type": log_entry.target_type,
+                "detail": log_entry.detail,
+                "created_at": str(log_entry.created_at),
+                "timestamp": str(log_entry.created_at),  # alias สำหรับ created_at
             }
-            for l in items
+            for log_entry in items
         ],
         "total": total,
         "page": page,

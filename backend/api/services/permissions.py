@@ -13,14 +13,14 @@ from api.services.activity_log import log as activity_log
 
 # Role hierarchy: higher index = higher rank
 ROLE_HIERARCHY = ["TRAINER", "ADMIN", "BRANCH_MASTER", "OWNER", "DEVELOPER"]
-ROLE_RANK = {r: i for i, r in enumerate(ROLE_HIERARCHY)}
+ROLE_RANK = {role: rank_index for rank_index, role in enumerate(ROLE_HIERARCHY)}
 
 
-def _to_uuid(val) -> uuid.UUID | None:
-    if not val:
+def _to_uuid(raw_value) -> uuid.UUID | None:
+    if not raw_value:
         return None
     try:
-        return uuid.UUID(str(val))
+        return uuid.UUID(str(raw_value))
     except (ValueError, AttributeError):
         return None
 
@@ -28,7 +28,7 @@ def _to_uuid(val) -> uuid.UUID | None:
 def _get_visible_roles(role: str) -> list[str]:
     """คืน list ของ roles ที่ current role สามารถดู/จัดการได้ (เฉพาะ roles ที่ต่ำกว่า)"""
     rank = ROLE_RANK.get(role.upper(), -1)
-    return [r.lower() for r in ROLE_HIERARCHY if ROLE_RANK[r] < rank]
+    return [hierarchy_role.lower() for hierarchy_role in ROLE_HIERARCHY if ROLE_RANK[hierarchy_role] < rank]
 
 
 def _check_permission_access(current_role: str, target_role: str = None):
@@ -58,18 +58,18 @@ def get_permission_matrix(current_user: dict, db: Session) -> dict:
     visible_roles = _get_visible_roles(role)
 
     items = db.query(PermissionMatrix).filter(
-        PermissionMatrix.role.in_([r.upper() for r in visible_roles])
+        PermissionMatrix.role.in_([vr.upper() for vr in visible_roles])
     ).all()
 
     # Build hierarchical response
     result = {rn: {} for rn in visible_roles}
-    for p in items:
-        rn = p.role.lower()
+    for matrix_row in items:
+        rn = matrix_row.role.lower()
         if rn not in result:
             continue
-        if p.feature_name not in result[rn]:
-            result[rn][p.feature_name] = {}
-        result[rn][p.feature_name][p.action.lower()] = p.is_allowed
+        if matrix_row.feature_name not in result[rn]:
+            result[rn][matrix_row.feature_name] = {}
+        result[rn][matrix_row.feature_name][matrix_row.action.lower()] = matrix_row.is_allowed
 
     return result
 
@@ -105,9 +105,9 @@ def update_permission(payload: dict, current_user: dict, db: Session) -> dict:
         existing.is_allowed = is_allowed
         existing.updated_by = user_id
         db.flush()
-        p = existing
+        permission_record = existing
     else:
-        p = PermissionMatrix(
+        permission_record = PermissionMatrix(
             branch_id=branch_id,
             role=target_role,
             feature_name=feature_name,
@@ -115,21 +115,21 @@ def update_permission(payload: dict, current_user: dict, db: Session) -> dict:
             is_allowed=is_allowed,
             updated_by=user_id,
         )
-        db.add(p)
+        db.add(permission_record)
         db.flush()
 
     activity_log(
-        db, current_user, "permission.update", "permission", str(p.id),
+        db, current_user, "permission.update", "permission", str(permission_record.id),
         detail=f"{target_role}.{feature_name}.{action} = {is_allowed}",
     )
 
     return {
-        "id": str(p.id),
-        "branch_id": str(p.branch_id) if p.branch_id else None,
-        "role": p.role,
-        "feature_name": p.feature_name,
-        "action": p.action,
-        "is_allowed": p.is_allowed,
+        "id": str(permission_record.id),
+        "branch_id": str(permission_record.branch_id) if permission_record.branch_id else None,
+        "role": permission_record.role,
+        "feature_name": permission_record.feature_name,
+        "action": permission_record.action,
+        "is_allowed": permission_record.is_allowed,
     }
 
 
@@ -159,12 +159,12 @@ def get_feature_toggles(current_user: dict, db: Session) -> dict:
     return {
         "items": [
             {
-                "id": str(f.id),
-                "partner_id": str(f.partner_id),
-                "feature_name": f.feature_name,
-                "is_enabled": f.is_enabled,
+                "id": str(feature_toggle.id),
+                "partner_id": str(feature_toggle.partner_id),
+                "feature_name": feature_toggle.feature_name,
+                "is_enabled": feature_toggle.is_enabled,
             }
-            for f in items
+            for feature_toggle in items
         ]
     }
 
@@ -185,27 +185,27 @@ def update_feature_toggle(payload: dict, current_user: dict, db: Session) -> dic
         existing.is_enabled = is_enabled
         existing.updated_by = user_id
         db.flush()
-        f = existing
+        feature_toggle = existing
     else:
-        f = FeatureToggle(
+        feature_toggle = FeatureToggle(
             partner_id=partner_id,
             feature_name=feature_name,
             is_enabled=is_enabled,
             updated_by=user_id,
         )
-        db.add(f)
+        db.add(feature_toggle)
         db.flush()
 
     activity_log(
-        db, current_user, "feature_toggle.update", "feature_toggle", str(f.id),
+        db, current_user, "feature_toggle.update", "feature_toggle", str(feature_toggle.id),
         detail=f"{feature_name} = {is_enabled}",
     )
 
     return {
-        "id": str(f.id),
-        "partner_id": str(f.partner_id),
-        "feature_name": f.feature_name,
-        "is_enabled": f.is_enabled,
+        "id": str(feature_toggle.id),
+        "partner_id": str(feature_toggle.partner_id),
+        "feature_name": feature_toggle.feature_name,
+        "is_enabled": feature_toggle.is_enabled,
     }
 
 

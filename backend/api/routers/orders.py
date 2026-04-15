@@ -171,14 +171,14 @@ def list_payments(
     payments = db.query(OrderPayment).filter_by(order_id=order_id).order_by(OrderPayment.created_at.desc()).all()
     return [
         {
-            "id": str(p.id),
-            "amount": float(p.amount),
-            "paid_at": str(p.paid_at),
-            "note": p.note,
-            "recorded_by": str(p.recorded_by) if p.recorded_by else None,
-            "created_at": str(p.created_at),
+            "id": str(payment.id),
+            "amount": float(payment.amount),
+            "paid_at": str(payment.paid_at),
+            "note": payment.note,
+            "recorded_by": str(payment.recorded_by) if payment.recorded_by else None,
+            "created_at": str(payment.created_at),
         }
-        for p in payments
+        for payment in payments
     ]
 
 

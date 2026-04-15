@@ -15,11 +15,11 @@ from api.services.activity_log import log as activity_log
 MAX_PAGE_SIZE = 100
 
 
-def _to_uuid(val) -> uuid.UUID | None:
-    if not val:
+def _to_uuid(raw_value) -> uuid.UUID | None:
+    if not raw_value:
         return None
     try:
-        return uuid.UUID(str(val))
+        return uuid.UUID(str(raw_value))
     except (ValueError, AttributeError):
         return None
 
@@ -96,7 +96,7 @@ def list_bookings(current_user: dict, db: Session, page: int = 1, page_size: int
         query = query.filter(Booking.start_time <= datetime.fromisoformat(f"{end_date}T23:59:59"))
     total = query.count()
     items = query.order_by(Booking.start_time).offset((page - 1) * page_size).limit(page_size).all()
-    return {"items": [_booking_to_dict(b) for b in items], "total": total, "page": page, "page_size": page_size}
+    return {"items": [_booking_to_dict(booking) for booking in items], "total": total, "page": page, "page_size": page_size}
 
 
 def get_booking(booking_id: uuid.UUID, current_user: dict, db: Session) -> dict:

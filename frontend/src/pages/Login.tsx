@@ -111,6 +111,7 @@ export default function Login() {
             </label>
             <input
               id="email"
+              data-testid="email-input"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -145,6 +146,7 @@ export default function Login() {
             </label>
             <input
               id="password"
+              data-testid="password-input"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -167,6 +169,7 @@ export default function Login() {
           {error && (
             <p
               role="alert"
+              data-testid="login-error"
               style={{
                 color: 'var(--color-error, #b00020)',
                 fontSize: '0.875rem',
@@ -180,6 +183,7 @@ export default function Login() {
           {/* Submit */}
           <button
             type="submit"
+            data-testid="login-submit"
             disabled={isLoading}
             style={{
               width: '100%',

@@ -367,6 +367,110 @@ open allure-report/index.html
 
 ---
 
+## 2.6 Test Data Persistence (`--keep-db`)
+
+### ปัญหาและความต้องการ
+
+ปกติ `db_session` fixture ใช้กลยุทธ์ **rollback-per-test**: ทุก test เริ่มจาก transaction ใหม่และ rollback เมื่อจบ ทำให้ tests แยกจากกันสมบูรณ์ แต่หมายความว่า **ข้อมูลทั้งหมดหายไปทันทีหลัง test suite จบ** ซึ่งไม่สะดวกเมื่อต้องการตรวจสอบ DB state หลัง test เช่น ดูว่าข้อมูลถูก insert ถูกต้องไหม
+
+`--keep-db` flag แก้ปัญหานี้ โดยเปลี่ยนพฤติกรรมจาก rollback → commit ทำให้ข้อมูลที่เกิดจาก test ยังคงอยู่ใน `pila_test` DB สำหรับตรวจสอบหลังรัน
+
+### วิธีใช้
+
+```bash
+# รัน tests แบบปกติ (rollback ทุก test — ไม่มีข้อมูลเหลือ)
+cd backend
+uv run pytest tests/be/ -m "be and not isolated_last" -v
+
+# รัน tests แบบ keep-db (commit แทน rollback — ข้อมูลเหลือใน pila_test)
+# ขั้นตอนที่ 1: รัน tests หลักก่อน (ไม่รวม isolated_last)
+uv run pytest tests/be/ -m "be and not isolated_last" -v --keep-db
+
+# ขั้นตอนที่ 2: รัน Medium Risk tests แยกหลังสุด
+uv run pytest tests/be/ -m "be and isolated_last" -v --keep-db
+
+# หลังจากนั้นเปิด psql แล้วตรวจดูข้อมูลได้เลย
+docker compose exec db psql -U pila_user -d pila_test
+```
+
+> **หมายเหตุ**: `--keep-db` ใช้สำหรับ debug เท่านั้น อย่าใช้ใน CI/CD pipeline
+
+### ทำไมต้องรัน 2 คำสั่ง (ไม่ใช่ 1)
+
+มี tests บางกลุ่มที่เรียกว่า **Medium Risk** ซึ่งเปลี่ยน state ที่ tests อื่นอาจพึ่งพาอยู่:
+
+- `test_internal_assign_pin` — เปลี่ยน PIN ของ owner user (กระทบ tests ที่ใช้ PIN login)
+- `test_pin_forgot_rate_limit` — trigger rate limit ที่มี TTL ค้างอยู่
+
+ถ้ารัน Medium Risk tests ปนกับ tests อื่น ลำดับการรันอาจทำให้ tests ที่ตามมา fail ได้ วิธีแก้คือรันมันหลังสุดด้วย marker `isolated_last`
+
+### การแบ่งประเภท Tests
+
+#### High Risk Tests — จัดการด้วย `reset_mutated_seed_state` autouse fixture
+Tests เหล่านี้แก้ไขข้อมูลที่ `seed_data` สร้างขึ้น แต่จัดการได้ด้วยการ reset ก่อนรัน
+
+| Test | สิ่งที่เปลี่ยน | วิธี Reset |
+|------|--------------|-----------|
+| `test_login_brute_force_protection` | สร้าง `LoginAttempt` records | ลบ `LoginAttempt` ของ owner ก่อนรัน |
+| `test_pin_lockout_after_five_attempts` | ตั้ง `user.pin_locked = True` | reset `pin_locked = False` ก่อนรัน |
+| `test_pin_reset_valid_otp` | ตั้ง `pin_otp.used = True` | reset `used = False` ก่อนรัน |
+| `test_internal_assign_password` | เปลี่ยน `user.password_hash` | ไม่มีผลต่อ tests อื่น (internal endpoint) |
+
+autouse fixture `reset_mutated_seed_state` ทำงานก่อนทุก test โดย query ตรวจสอบ state ปัจจุบัน ถ้าพบว่าไม่ตรงกับ expected state จะ reset ให้ใหม่ก่อนดำเนินการต่อ
+
+#### Medium Risk Tests — ใช้ marker `@pytest.mark.isolated_last`
+Tests เหล่านี้ต้องรันหลังสุด เพราะเปลี่ยน state ที่ยาก reset กลับ หรือมี TTL ที่ยังค้างอยู่
+
+| Test | เหตุผลที่ต้องแยก |
+|------|----------------|
+| `test_internal_assign_pin` | เปลี่ยน PIN ของ owner — tests อื่นที่ login ด้วย owner PIN จะ fail ถ้ารันก่อน |
+| `test_pin_forgot_rate_limit` | trigger rate limit ที่มี in-memory TTL — อาจกระทบ tests อื่นที่ request OTP |
+
+### Implementation (ยังไม่ได้ implement)
+
+เมื่อพร้อมจะ implement มีไฟล์ที่ต้องแก้ 4 ไฟล์:
+
+1. **`pytest.ini`** — register marker ใหม่:
+   ```ini
+   markers =
+       isolated_last: run these tests last (Medium Risk — mutate shared state)
+   ```
+
+2. **`conftest.py` (root)** — เพิ่ม CLI option:
+   ```python
+   def pytest_addoption(parser):
+       parser.addoption("--keep-db", action="store_true", default=False,
+                        help="Commit instead of rollback after each test (for manual inspection)")
+   ```
+
+3. **`tests/be/conftest.py`** — แก้ `db_session` + เพิ่ม `reset_mutated_seed_state`:
+   ```python
+   @pytest.fixture(scope="function")
+   def db_session(request, test_engine):
+       connection = test_engine.connect()
+       transaction = connection.begin()
+       TestSession = sessionmaker(bind=connection)
+       session = TestSession()
+       yield session
+       session.close()
+       if request.config.getoption("--keep-db"):
+           transaction.commit()   # ข้อมูลยังอยู่ใน pila_test
+       else:
+           transaction.rollback() # ค่าเริ่มต้น — ข้อมูลหายทุกครั้ง
+       connection.close()
+   ```
+
+4. **`tests/be/test_auth_api.py`** — เพิ่ม marker:
+   ```python
+   @pytest.mark.isolated_last
+   async def test_internal_assign_pin(...): ...
+
+   @pytest.mark.isolated_last
+   async def test_pin_forgot_rate_limit(...): ...
+   ```
+
+---
+
 ```python
 # tests/be/conftest.py
 #

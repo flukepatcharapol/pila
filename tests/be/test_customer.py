@@ -197,7 +197,7 @@ def test_trainer_chip_filters_by_branch(page, request):
                 "Trainer chip must filter by selected branch."
             )
         # ต้องไม่มี trainer จาก Kanchanaburi
-        assert not any("Kanchanaburi" in t for t in trainer_chips), (
+        assert not any("Kanchanaburi" in chip_text for chip_text in trainer_chips), (
             "Kanchanaburi trainers must NOT appear when Pattaya is selected."
         )
 
@@ -207,7 +207,7 @@ def test_trainer_chip_filters_by_branch(page, request):
 
     with allure.step("Assert trainer list updated to Kanchanaburi"):
         trainer_chips = page.locator("[data-testid='trainer-chip']").all_text_contents()
-        assert not any("Pattaya" in t for t in trainer_chips), (
+        assert not any("Pattaya" in chip_text for chip_text in trainer_chips), (
             "Pattaya trainers must NOT appear after switching to Kanchanaburi."
         )
 

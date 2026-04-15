@@ -582,15 +582,15 @@ user.create, permission.update
 | 10 | BE Design — DB Schema + API Spec | ✅ Done | `05_be_design.md` (v1.2) |
 | 11 | Automation Test Plan + Scripts | ✅ Done | `06_automation_test_plan.md`, `common_api.py`, `common_web.py` |
 | 12 | Setup & README | ✅ Done | `SETUP.md`, `BE_README.md`, `FE_README.md` |
-| 13 | Build BE (FastAPI + PostgreSQL) | ⬜ Next | API code, DB migrations |
-| 14 | BE Tests Pass (pytest + Allure) | ⬜ Pending | All BE test cases green |
-| 15 | Build FE UI + Connect API (E2E) | ⬜ Pending | React app, API integration |
-| 16 | FE + E2E Tests Pass (Playwright) | ⬜ Pending | All FE + integration test cases green |
+| 13 | Build BE (FastAPI + PostgreSQL) | ✅ Done | API code, DB migrations, 204 BE tests passing |
+| 14 | BE Tests Pass (pytest + Allure) | ✅ Done | All 204 BE tests passing w/ --keep-db isolation |
+| 15 | Build FE UI + Connect API (E2E) | ✅ Done | React app, API integration, auth dual-session |
+| 16 | FE + E2E Tests Pass (Playwright) | ⏳ In Progress | All FE + integration test cases green |
 | 17 | CI/CD Pipeline + Deploy (dev/prod) | ⬜ Pending | GitHub Actions, domain, env separation |
 | 18 | Scheduled Test Runs | ⬜ Pending | Cron-based test automation |
 
 ### Current Status
-> **Now at Step 13** — Build BE
+> **Now at Step 16** — FE + E2E Tests Pass (Playwright) | Previous: Steps 13-15 complete (auth dual-session fully implemented)
 
 ---
 

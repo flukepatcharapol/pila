@@ -16,11 +16,11 @@ from api.services.customer import generate_customer_code
 MAX_PAGE_SIZE = 100
 
 
-def _to_uuid(val) -> uuid.UUID | None:
-    if not val:
+def _to_uuid(raw_value) -> uuid.UUID | None:
+    if not raw_value:
         return None
     try:
-        return uuid.UUID(str(val))
+        return uuid.UUID(str(raw_value))
     except (ValueError, AttributeError):
         return None
 
@@ -85,7 +85,7 @@ def list_customers(
     items = query.offset(offset).limit(page_size).all()
 
     return {
-        "items": [_customer_to_dict(c, db) for c in items],
+        "items": [_customer_to_dict(customer, db) for customer in items],
         "total": total,
         "page": page,
         "page_size": page_size,
@@ -108,14 +108,14 @@ def get_customer(customer_id: uuid.UUID, current_user: dict, db: Session) -> dic
     data["remaining_hours"] = float(hour_balance.remaining) if hour_balance else 0.0
     data["order_history"] = [
         {
-            "id": str(o.id),
-            "order_date": str(o.order_date),
-            "hours": o.hours,
-            "bonus_hours": o.bonus_hours,
-            "total_price": float(o.total_price),
-            "payment_method": o.payment_method,
+            "id": str(order.id),
+            "order_date": str(order.order_date),
+            "hours": order.hours,
+            "bonus_hours": order.bonus_hours,
+            "total_price": float(order.total_price),
+            "payment_method": order.payment_method,
         }
-        for o in orders
+        for order in orders
     ]
     return data
 
@@ -267,11 +267,11 @@ def _customer_to_dict(customer: Customer, db: Session) -> dict:
     trainer_name = None
     caretaker_name = None
     if customer.trainer_id:
-        t = db.query(Trainer).filter_by(id=customer.trainer_id).first()
-        trainer_name = t.name if t else None
+        trainer = db.query(Trainer).filter_by(id=customer.trainer_id).first()
+        trainer_name = trainer.name if trainer else None
     if customer.caretaker_id:
-        c = db.query(Caretaker).filter_by(id=customer.caretaker_id).first()
-        caretaker_name = c.name if c else None
+        caretaker = db.query(Caretaker).filter_by(id=customer.caretaker_id).first()
+        caretaker_name = caretaker.name if caretaker else None
 
     return {
         "id": str(customer.id),

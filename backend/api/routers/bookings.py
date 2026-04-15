@@ -176,9 +176,9 @@ def external_booking(
     if body.slot_times:
         times = sorted(body.slot_times)
         # Each slot is 1 hour — check contiguous
-        for i in range(1, len(times)):
-            h_prev = int(times[i-1].split(":")[0])
-            h_curr = int(times[i].split(":")[0])
+        for slot_index in range(1, len(times)):
+            h_prev = int(times[slot_index - 1].split(":")[0])
+            h_curr = int(times[slot_index].split(":")[0])
             if h_curr - h_prev != 1:
                 raise HTTPException(status_code=400, detail="Slot times must be contiguous (1-hour intervals)")
         # Use date from start_time if provided, else today

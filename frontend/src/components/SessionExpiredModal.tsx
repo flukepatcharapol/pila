@@ -18,6 +18,7 @@ export default function SessionExpiredModal({ isOpen, onConfirm }: SessionExpire
   return (
     <div
       role="dialog"
+      data-testid="session-expired-modal"
       aria-modal="true"
       aria-labelledby="session-expired-title"
       style={{
@@ -63,6 +64,7 @@ export default function SessionExpiredModal({ isOpen, onConfirm }: SessionExpire
           {'Session ของท่านหมดอายุแล้ว\nกรุณาเข้าสู่ระบบใหม่'}
         </p>
         <button
+          data-testid="session-expired-confirm"
           onClick={onConfirm}
           style={{
             backgroundColor: 'var(--color-primary, #162839)',

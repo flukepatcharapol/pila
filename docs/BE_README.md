@@ -236,15 +236,36 @@ alembic downgrade -1
 ## การรัน Tests
 
 ```bash
-# รัน BE test cases ทั้งหมด
-pytest tests/be/ -v
+# รัน BE test cases ทั้งหมด (rollback ทุก test — ไม่มีข้อมูลเหลือ)
+uv run pytest tests/be/ -m "be and not isolated_last" -v
 
 # รัน test เฉพาะ module
-pytest tests/be/test_auth_api.py -v
+uv run pytest tests/be/test_auth_api.py -v
 
 # รัน test พร้อมดู coverage
-pytest tests/be/ -v --cov=api --cov-report=html
+uv run pytest tests/be/ -v --cov=api --cov-report=html
+
+# รัน พร้อม Allure report
+uv run pytest tests/be/ -m "be and not isolated_last" -v --alluredir=allure-results
 ```
+
+### รัน tests แบบ keep-db (ข้อมูลยังอยู่ใน `pila_test` หลังจบ)
+
+ใช้เมื่อต้องการตรวจสอบ DB state หลัง test เช่น ดูว่าข้อมูลถูก insert ถูกต้องไหม
+
+```bash
+# ขั้นตอนที่ 1: รัน tests หลัก (commit แทน rollback)
+uv run pytest tests/be/ -m "be and not isolated_last" -v --keep-db
+
+# ขั้นตอนที่ 2: รัน Medium Risk tests แยกหลังสุด
+uv run pytest tests/be/ -m "be and isolated_last" -v --keep-db
+
+# ตรวจสอบข้อมูลใน DB
+docker compose exec db psql -U pila_user -d pila_test
+```
+
+> **หมายเหตุ**: `--keep-db` ใช้สำหรับ debug เท่านั้น อย่าใช้ใน CI/CD pipeline
+> ดูรายละเอียดเพิ่มเติมที่ `docs/06_automation_test_plan.md` หัวข้อ 2.6
 
 ---
 

@@ -83,10 +83,10 @@ def get_permissions_by_role(
         "role": role.upper(),
         "permissions": [
             {
-                "feature_name": p.feature_name,
-                "action": p.action,
-                "is_allowed": p.is_allowed,
+                "feature_name": matrix_row.feature_name,
+                "action": matrix_row.action,
+                "is_allowed": matrix_row.is_allowed,
             }
-            for p in items
+            for matrix_row in items
         ],
     }

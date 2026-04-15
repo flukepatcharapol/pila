@@ -27,21 +27,21 @@ class CancelPolicyRequest(BaseModel):
     branch_id: Optional[str] = None   # ถ้าไม่ระบุ ใช้ branch ของ current user
 
 
-def _to_dict(p: CancelPolicy) -> dict:
+def _to_dict(policy: CancelPolicy) -> dict:
     return {
-        "id": str(p.id),
-        "branch_id": str(p.branch_id),
-        "hours_before": p.hours_before,
-        "return_hour": p.return_hour,
-        "updated_at": str(p.updated_at),
+        "id": str(policy.id),
+        "branch_id": str(policy.branch_id),
+        "hours_before": policy.hours_before,
+        "return_hour": policy.return_hour,
+        "updated_at": str(policy.updated_at),
     }
 
 
-def _to_uuid(val) -> uuid.UUID | None:
-    if not val:
+def _to_uuid(raw_value) -> uuid.UUID | None:
+    if not raw_value:
         return None
     try:
-        return uuid.UUID(str(val))
+        return uuid.UUID(str(raw_value))
     except (ValueError, AttributeError):
         return None
 

@@ -87,8 +87,8 @@ def get_manual(
     """
     role = current_user.get("role", "")
     visible_sections = [
-        s for s in _MANUAL_SECTIONS
-        if role in s["visible_to"]
+        section for section in _MANUAL_SECTIONS
+        if role in section["visible_to"]
     ]
     return {
         "title": "Pila Studio — คู่มือการใช้งาน",

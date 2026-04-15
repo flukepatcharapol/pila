@@ -15,25 +15,25 @@ from api.services.activity_log import log as activity_log
 MAX_PAGE_SIZE = 100
 
 
-def _to_uuid(val) -> uuid.UUID | None:
-    if not val:
+def _to_uuid(raw_value) -> uuid.UUID | None:
+    if not raw_value:
         return None
     try:
-        return uuid.UUID(str(val))
+        return uuid.UUID(str(raw_value))
     except (ValueError, AttributeError):
         return None
 
 
-def _to_dict(t: Trainer) -> dict:
+def _to_dict(trainer: Trainer) -> dict:
     """แปลง Trainer ORM object → dict สำหรับ API response"""
     return {
-        "id": str(t.id),
-        "branch_id": str(t.branch_id),
-        "name": t.name,
-        "display_name": t.display_name,
-        "email": t.email,
-        "profile_photo_url": t.profile_photo_url,
-        "status": t.status,
+        "id": str(trainer.id),
+        "branch_id": str(trainer.branch_id),
+        "name": trainer.name,
+        "display_name": trainer.display_name,
+        "email": trainer.email,
+        "profile_photo_url": trainer.profile_photo_url,
+        "status": trainer.status,
     }
 
 
@@ -73,14 +73,19 @@ def list_trainers(current_user: dict, db: Session, page: int = 1, page_size: int
 
     total = query.count()
     items = query.offset((page - 1) * page_size).limit(page_size).all()
-    return {"items": [_to_dict(t) for t in items], "total": total, "page": page, "page_size": page_size}
+    return {
+        "items": [_to_dict(trainer) for trainer in items],
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+    }
 
 
 def get_trainer(trainer_id: uuid.UUID, current_user: dict, db: Session) -> dict:
-    t = db.query(Trainer).filter_by(id=trainer_id).first()
-    if not t:
+    trainer = db.query(Trainer).filter_by(id=trainer_id).first()
+    if not trainer:
         raise HTTPException(status_code=404, detail="Trainer not found")
-    return _to_dict(t)
+    return _to_dict(trainer)
 
 
 def create_trainer(payload: dict, current_user: dict, db: Session) -> dict:
@@ -97,7 +102,7 @@ def create_trainer(payload: dict, current_user: dict, db: Session) -> dict:
     # display_name: "Name:BranchPrefix" — ใช้แสดงใน dropdown เพื่อแยก trainer ต่าง branch
     display_name = payload.get("display_name") or f"{name}:{branch.prefix}"
 
-    t = Trainer(
+    trainer = Trainer(
         branch_id=branch_id,
         name=name,
         display_name=display_name,
@@ -105,33 +110,33 @@ def create_trainer(payload: dict, current_user: dict, db: Session) -> dict:
         profile_photo_url=payload.get("profile_photo_url"),
         status=payload.get("status", "ACTIVE"),
     )
-    db.add(t)
+    db.add(trainer)
     db.flush()
 
-    activity_log(db, current_user, "trainer.create", "trainer", str(t.id),
+    activity_log(db, current_user, "trainer.create", "trainer", str(trainer.id),
                  detail=f"Created trainer: {name}")
-    return _to_dict(t)
+    return _to_dict(trainer)
 
 
 def update_trainer(trainer_id: uuid.UUID, payload: dict, current_user: dict, db: Session) -> dict:
-    t = db.query(Trainer).filter_by(id=trainer_id).first()
-    if not t:
+    trainer = db.query(Trainer).filter_by(id=trainer_id).first()
+    if not trainer:
         raise HTTPException(status_code=404, detail="Trainer not found")
 
-    before = _to_dict(t)
+    before = _to_dict(trainer)
     for field in ["name", "display_name", "email", "profile_photo_url", "status"]:
         if field in payload and payload[field] is not None:
-            setattr(t, field, payload[field])
+            setattr(trainer, field, payload[field])
     db.flush()
 
     activity_log(db, current_user, "trainer.edit", "trainer", str(trainer_id),
-                 changes={"before": before, "after": _to_dict(t)})
-    return _to_dict(t)
+                 changes={"before": before, "after": _to_dict(trainer)})
+    return _to_dict(trainer)
 
 
 def delete_trainer(trainer_id: uuid.UUID, current_user: dict, db: Session) -> None:
-    t = db.query(Trainer).filter_by(id=trainer_id).first()
-    if not t:
+    trainer = db.query(Trainer).filter_by(id=trainer_id).first()
+    if not trainer:
         raise HTTPException(status_code=404, detail="Trainer not found")
 
     # INT-04: ไม่ลบ trainer ที่ยังมี active customer อยู่
@@ -153,6 +158,6 @@ def delete_trainer(trainer_id: uuid.UUID, current_user: dict, db: Session) -> No
             detail="Cannot delete trainer with active bookings",
         )
 
-    db.delete(t)
+    db.delete(trainer)
     db.flush()
     activity_log(db, current_user, "trainer.delete", "trainer", str(trainer_id))

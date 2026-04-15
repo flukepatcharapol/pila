@@ -12,6 +12,15 @@ from dotenv import load_dotenv
 load_dotenv(".env.test")
 
 
+def pytest_addoption(parser):
+    parser.addoption(
+        "--keep-db",
+        action="store_true",
+        default=False,
+        help="Commit instead of rollback after each test so data persists in pila_test for inspection",
+    )
+
+
 # ─── Shared Environment Fixtures ────────────────────────────────────────────────
 
 @pytest.fixture(scope="session")

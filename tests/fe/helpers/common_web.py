@@ -397,6 +397,103 @@ def assert_submit_button_loading(page: Page, request=None) -> None:
         )
 
 
+# ─── Dual-Session Storage Helpers ────────────────────────────────────────────────
+
+def get_local_storage(page: Page, key: str) -> str | None:
+    """
+    อ่านค่าจาก localStorage ด้วย key ที่กำหนด
+    คืน None ถ้าไม่มี key นั้น
+
+    ตัวอย่าง:
+        token = get_local_storage(page, 'access_token')
+    """
+    result = page.evaluate(f"() => localStorage.getItem('{key}')")
+    return result  # type: ignore[return-value]
+
+
+def expire_access_token(page: Page) -> None:
+    """
+    ลบ access_token ออกจาก localStorage เพื่อ simulate การหมดอายุของ JWT (6h)
+    ทำให้ ProtectedRoute redirect ไป /pin (ถ้า password session ยังใช้ได้)
+
+    Design doc § 8.3: "On 401 from protected API call... IF password_session_expires_at > now() → /pin"
+    """
+    with allure.step("Expire access token (remove from localStorage)"):
+        page.evaluate("() => localStorage.removeItem('access_token')")
+
+
+def expire_password_session(page: Page) -> None:
+    """
+    ตั้ง password_session_expires_at เป็นอดีต เพื่อ simulate การหมดอายุของ password session (30d)
+    ทำให้ isPasswordSessionValid() คืน false
+
+    Design doc § 8.3: เมื่อ password session หมด → modal → /login
+    """
+    with allure.step("Expire password session (set expires_at to past)"):
+        page.evaluate("""
+            () => {
+                // ตั้ง expires_at เป็น 1ms (อดีต) เพื่อ simulate session expiry
+                // password_session_token ยังอยู่ใน localStorage (opaque token)
+                // แต่ isPasswordSessionValid() จะคืน false
+                localStorage.setItem('password_session_expires_at', '1');
+            }
+        """)
+
+
+def is_jwt_shaped(value: str) -> bool:
+    """
+    ตรวจสอบว่าค่าเป็น JWT format (header.payload.signature = 3 ส่วนคั่นด้วย .)
+    ใช้ verify ว่า login response คืน opaque token (ไม่ใช่ JWT)
+
+    Design doc § 3.1: opaque token ต้องไม่ใช่ JWT — ไม่มี 3 ส่วน
+    """
+    parts = value.split(".")
+    return len(parts) == 3 and all(len(part) > 4 for part in parts)
+
+
+def assert_session_expired_modal_visible(page: Page, timeout: int = 5000) -> None:
+    """
+    ตรวจสอบว่า SessionExpiredModal แสดงอยู่พร้อม Thai text ที่ถูกต้อง
+
+    Design doc § 8.3: modal ต้องแสดง "Session ของท่านหมดอายุแล้ว\\nกรุณาเข้าสู่ระบบใหม่"
+    """
+    with allure.step("Assert session expired modal is visible with Thai text"):
+        modal = page.locator("[data-testid='session-expired-modal']")
+        modal.wait_for(state="visible", timeout=timeout)
+
+        content = modal.text_content() or ""
+        assert "Session ของท่านหมดอายุแล้ว" in content, (
+            f"Session expired modal must contain 'Session ของท่านหมดอายุแล้ว' "
+            f"per design doc § 8.3 but got: '{content}'"
+        )
+
+
+def click_session_expired_confirm(page: Page) -> None:
+    """คลิกปุ่ม OK ใน SessionExpiredModal → trigger clearAllTokens + redirect /login"""
+    with allure.step("Click OK on session expired modal"):
+        page.locator("[data-testid='session-expired-confirm']").click()
+
+
+def assert_tokens_cleared(page: Page) -> None:
+    """
+    ตรวจสอบว่า auth tokens ทั้งหมดถูกลบออกจาก localStorage แล้ว
+    ใช้หลัง logout หรือ session expiry ที่ถูกต้อง
+
+    Design doc § 8.4: ต้อง clear ทุก key หลัง session expired/logout
+    """
+    with allure.step("Assert all auth tokens cleared from localStorage"):
+        pwd_token = get_local_storage(page, "password_session_token")
+        access_token = get_local_storage(page, "access_token")
+        assert pwd_token is None, (
+            "password_session_token must be removed from localStorage after logout/expiry "
+            "but it is still present. This is a security concern — token must be cleared."
+        )
+        assert access_token is None, (
+            "access_token must be removed from localStorage after logout/expiry "
+            "but it is still present. This is a security concern — token must be cleared."
+        )
+
+
 # ─── Network Helpers ──────────────────────────────────────────────────────────────
 
 def set_slow_network(page: Page) -> None:
