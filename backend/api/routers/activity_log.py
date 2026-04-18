@@ -19,18 +19,27 @@ def list_activity_log(
     current_user: dict = Depends(require_pin_verified),
     db: Session = Depends(get_db),
 ):
+    from api.dependencies.branch_scope import get_user_branch_ids
+    import uuid as _uuid
     query = db.query(ActivityLog)
     role = current_user.get("role", "")
     partner_id = current_user.get("partner_id")
-    branch_id = current_user.get("branch_id")
 
-    if role not in ("DEVELOPER", "OWNER"):
-        if branch_id:
-            import uuid as _uuid
+    if role == "OWNER":
+        pid = None
+        if partner_id:
             try:
-                query = query.filter(ActivityLog.branch_id == _uuid.UUID(str(branch_id)))
-            except (ValueError, AttributeError):
-                pass
+                pid = _uuid.UUID(str(partner_id))
+            except (ValueError, AttributeError, TypeError):
+                pid = None
+        if pid:
+            query = query.filter(ActivityLog.partner_id == pid)
+    elif role != "DEVELOPER":
+        allowed = get_user_branch_ids(current_user)
+        if allowed:
+            query = query.filter(ActivityLog.branch_id.in_(allowed))
+        else:
+            query = query.filter(ActivityLog.id == _uuid.UUID(int=0))
 
     if action:
         query = query.filter(ActivityLog.action.ilike(f"%{action}%"))

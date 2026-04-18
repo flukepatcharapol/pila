@@ -170,12 +170,17 @@ def verify_pin_and_issue_token(password_session: PasswordSession, pin: str, db: 
     db.add(PinAttempt(user_id=user.id, success=True))
     db.flush()
 
-    # สร้าง access JWT (6 hours)
+    # สร้าง access JWT (6 hours) with multi-branch scope
+    from api.dependencies.branch_scope import get_user_branch_ids
+    scoped_branches = get_user_branch_ids(user)
+    branch_ids_for_jwt = (
+        None if scoped_branches is None else [str(b) for b in scoped_branches]
+    )
     access_token = create_jwt_token(
         user_id=str(user.id),
         role=user.role,
         partner_id=str(user.partner_id),
-        branch_id=str(user.branch_id) if user.branch_id else None,
+        branch_ids=branch_ids_for_jwt,
         pin_verified=True,
         is_temporary=False,
         expires_delta=timedelta(minutes=settings.PIN_ACCESS_TOKEN_EXPIRE_MINUTES),
@@ -194,6 +199,7 @@ def verify_pin_and_issue_token(password_session: PasswordSession, pin: str, db: 
         expires_at=expires_at,
         is_active=True,
         email=user.email,
+        access_token=access_token,
     ))
     db.flush()
 
@@ -202,6 +208,11 @@ def verify_pin_and_issue_token(password_session: PasswordSession, pin: str, db: 
         "access_token": access_token,
         "expires_in": expires_in,
         "token_type": "bearer",
+        "user_id": str(user.id),
+        "email": user.email,
+        "role": user.role,
+        "partner_id": str(user.partner_id),
+        ## "branch_ids": branch_ids,  Waiting for branch DB
     }
 
 
@@ -242,6 +253,7 @@ def logout(token_payload: dict, db: Session) -> dict:
                         expires_at=expires_at,
                         is_active=False,
                         email=email,
+                        access_token=token_payload,
                     ))
                     db.flush()
 
@@ -404,7 +416,13 @@ def change_password(user_id, old_password: str, new_password: str, db: Session) 
     db.query(UserSession).filter_by(user_id=user_id, is_active=True).update({"is_active": False})
     db.flush()
 
-    return {"message": "Password changed successfully"}
+    from api.dependencies.branch_scope import get_user_branch_ids
+    scoped = get_user_branch_ids(user)
+    branch_ids = None if scoped is None else [str(b) for b in scoped]
+    # return {f"message": "Password changed successfully"}
+    return{
+        "message": "Password changed successfully"
+    }
 
 
 def assign_password(user_id, new_password: str, db: Session) -> dict:
@@ -429,17 +447,20 @@ def assign_pin(user_id, new_pin: str, db: Session) -> dict:
 
 
 def get_me(user_id, db: Session) -> dict:
-    """ดึงข้อมูล current user"""
+    """ดึงข้อมูล current user (multi-branch: branch_ids is None when unrestricted)"""
     user = db.query(User).filter_by(id=user_id).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    from api.dependencies.branch_scope import get_user_branch_ids
+    scoped = get_user_branch_ids(user)
+    branch_ids = None if scoped is None else [str(b) for b in scoped]
     return {
         "id": str(user.id),
         "username": user.username,
         "email": user.email,
         "role": user.role,
         "partner_id": str(user.partner_id),
-        "branch_id": str(user.branch_id) if user.branch_id else None,
+        "branch_ids": branch_ids,
     }
 
 

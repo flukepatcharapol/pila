@@ -35,16 +35,26 @@ def create_jwt_token(
     user_id: str,
     role: str,
     partner_id: str,
-    branch_id: str | None = None,
+    branch_ids: list | None = None,
     pin_verified: bool = False,
     expires_delta: timedelta | None = None,
     is_temporary: bool = False,
+    **_legacy,
 ) -> str:
     """
-    สร้าง JWT token
+    สร้าง JWT token (multi-branch edition).
+
+    branch_ids:
+      None       → unrestricted (DEVELOPER/OWNER)
+      list[str]  → this user may only access these branches
+
     - pin_verified=False  → temporary token (ใช้แค่ /auth/pin/verify)
     - pin_verified=True   → full access token
     - is_temporary=True   → mark เป็น temp token เพื่อ block access endpoints
+
+    NOTE: legacy `branch_id=` kwarg is tolerated and wrapped into a single-item
+    list, to keep older call sites compiling during the refactor. It will be
+    removed once all callers pass branch_ids directly.
     """
     jti = str(uuid.uuid4())
 
@@ -55,11 +65,20 @@ def create_jwt_token(
             minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
         )
 
+    # tolerate legacy branch_id kwarg
+    if branch_ids is None and "branch_id" in _legacy and _legacy["branch_id"]:
+        branch_ids = [_legacy["branch_id"]]
+
+    if branch_ids is None:
+        encoded_branch_ids = None
+    else:
+        encoded_branch_ids = [str(b) for b in branch_ids if b is not None]
+
     payload = {
         "sub": str(user_id),
         "role": str(role),
         "partner_id": str(partner_id),
-        "branch_id": str(branch_id) if branch_id else None,
+        "branch_ids": encoded_branch_ids,
         "pin_verified": pin_verified,
         "is_temporary": is_temporary,
         "jti": jti,

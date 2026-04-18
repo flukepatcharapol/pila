@@ -11,6 +11,7 @@ from api.models.customer import Customer, CustomerHourBalance, CustomerCodeCount
 from api.models.trainer import Trainer, Caretaker
 from api.models.order import Order
 from api.services.customer import generate_customer_code
+from api.dependencies.branch_scope import get_user_branch_ids, assert_branch_access
 
 
 MAX_PAGE_SIZE = 100
@@ -26,21 +27,23 @@ def _to_uuid(raw_value) -> uuid.UUID | None:
 
 
 def _apply_branch_filter(query, current_user: dict, db: Session):
-    """Apply branch/partner filter ตาม role"""
+    """Apply branch/partner filter ตาม role (multi-branch aware)."""
     role = current_user.get("role", "")
     partner_id = current_user.get("partner_id")
-    branch_id = current_user.get("branch_id")
+    allowed = get_user_branch_ids(current_user)  # None → unrestricted
 
     if role == "DEVELOPER":
         pass  # เห็นทุกอย่าง
     elif role in ("OWNER",):
         query = query.filter(Customer.partner_id == _to_uuid(partner_id))
     else:
-        # BRANCH_MASTER, ADMIN, TRAINER — เห็นแค่ branch ตัวเอง
-        if branch_id:
-            query = query.filter(Customer.branch_id == _to_uuid(branch_id))
+        # BRANCH_MASTER, ADMIN, TRAINER — scope to their branch list
+        if allowed:
+            query = query.filter(Customer.branch_id.in_(allowed))
         else:
+            # scoped role with zero branches → no visibility
             query = query.filter(Customer.partner_id == _to_uuid(partner_id))
+            query = query.filter(Customer.id == uuid.UUID(int=0))  # force empty
 
     return query
 
@@ -241,10 +244,14 @@ def _check_access(customer: Customer, current_user: dict):
     if role == "DEVELOPER":
         return
     partner_id = _to_uuid(current_user.get("partner_id"))
-    branch_id = _to_uuid(current_user.get("branch_id"))
     if partner_id and customer.partner_id != partner_id:
         raise HTTPException(status_code=403, detail="Access denied")
-    if role not in ("OWNER",) and branch_id and customer.branch_id != branch_id:
+    if role == "OWNER":
+        return
+    allowed = get_user_branch_ids(current_user)
+    if allowed is None:
+        return
+    if customer.branch_id not in allowed:
         raise HTTPException(status_code=403, detail="Access denied")
 
 
@@ -302,10 +309,12 @@ def _customer_to_dict(customer: Customer, db: Session) -> dict:
 
 def _log_activity(db: Session, current_user: dict, action: str, target_id: str):
     from api.models.activity_log import ActivityLog
+    allowed = get_user_branch_ids(current_user)
+    chosen_branch = None if not allowed else allowed[0]
     db.add(ActivityLog(
         user_id=_to_uuid(current_user.get("sub")),
         partner_id=_to_uuid(current_user.get("partner_id")),
-        branch_id=_to_uuid(current_user.get("branch_id")),
+        branch_id=chosen_branch,
         action=action,
         target_id=target_id,
         target_type="customer",

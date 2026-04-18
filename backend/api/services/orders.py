@@ -43,18 +43,19 @@ def _order_to_dict(order: Order) -> dict:
 
 
 def _apply_scope(query, current_user: dict):
+    from api.dependencies.branch_scope import get_user_branch_ids
     role = current_user.get("role", "")
     partner_id = current_user.get("partner_id")
-    branch_id = current_user.get("branch_id")
+    allowed = get_user_branch_ids(current_user)
     if role == "DEVELOPER":
         pass
     elif role == "OWNER":
         query = query.filter(Order.partner_id == _to_uuid(partner_id))
     else:
-        if branch_id:
-            query = query.filter(Order.branch_id == _to_uuid(branch_id))
+        if allowed:
+            query = query.filter(Order.branch_id.in_(allowed))
         else:
-            query = query.filter(Order.partner_id == _to_uuid(partner_id))
+            query = query.filter(Order.id == uuid.UUID(int=0))
     return query
 
 

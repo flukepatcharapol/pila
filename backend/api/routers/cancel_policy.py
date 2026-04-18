@@ -51,12 +51,14 @@ def get_cancel_policy(
     current_user: dict = Depends(require_pin_verified),
     db: Session = Depends(get_db),
 ):
-    """ดู cancel policy ของ branch ปัจจุบัน"""
-    branch_id = current_user.get("branch_id")
-    if not branch_id:
+    """ดู cancel policy ของ branch ปัจจุบัน (multi-branch: first branch of user)"""
+    from api.dependencies.branch_scope import get_user_branch_ids
+    allowed = get_user_branch_ids(current_user)
+    if not allowed:
         return {"hours_before": 24, "return_hour": True, "branch_id": None}
+    branch_id = allowed[0]
 
-    policy = db.query(CancelPolicy).filter_by(branch_id=_to_uuid(branch_id)).first()
+    policy = db.query(CancelPolicy).filter_by(branch_id=branch_id).first()
     if not policy:
         return {"hours_before": 24, "return_hour": True, "branch_id": str(branch_id)}
 
@@ -74,7 +76,13 @@ def update_cancel_policy(
     if role not in ("DEVELOPER", "OWNER", "BRANCH_MASTER"):
         raise HTTPException(status_code=403, detail="Forbidden")
 
-    branch_id_str = body.branch_id or current_user.get("branch_id")
+    from api.dependencies.branch_scope import get_user_branch_ids, assert_branch_access
+    # Prefer explicit body.branch_id; otherwise use the user's first scoped branch
+    branch_id_str = body.branch_id
+    if not branch_id_str:
+        allowed = get_user_branch_ids(current_user)
+        if allowed:
+            branch_id_str = str(allowed[0])
 
     # Owner without branch_id: find first branch of partner
     if not branch_id_str and role in ("OWNER", "DEVELOPER"):
@@ -89,6 +97,9 @@ def update_cancel_policy(
         raise HTTPException(status_code=400, detail="branch_id is required")
 
     branch_id = _to_uuid(branch_id_str)
+    # Enforce: scoped roles cannot write to another branch
+    if role not in ("DEVELOPER", "OWNER"):
+        assert_branch_access(current_user, branch_id)
     user_id = _to_uuid(current_user.get("sub"))
 
     policy = db.query(CancelPolicy).filter_by(branch_id=branch_id).first()

@@ -128,6 +128,7 @@ def upgrade() -> None:
         sa.Column("id", sa.UUID(), primary_key=True, server_default=sa.text("gen_random_uuid()")),
         sa.Column("user_id", sa.UUID(), sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
         sa.Column("token_jti", sa.String(255), unique=True),
+        sa.Column("access_token", sa.Text),
         sa.Column("expires_at", sa.DateTime, nullable=False),
         sa.Column("is_active", sa.Boolean, default=True),
         sa.Column("created_at", sa.DateTime, nullable=False),

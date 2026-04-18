@@ -4,8 +4,10 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException
 
 from api.models.user import User
+from api.models.branch import Branch
 from api.utils.auth import hash_password, hash_pin
 from api.services.activity_log import log as activity_log
+from api.dependencies.branch_scope import get_user_branch_ids
 
 # Role hierarchy for access control
 ROLE_HIERARCHY = ["TRAINER", "ADMIN", "BRANCH_MASTER", "OWNER", "DEVELOPER"]
@@ -22,13 +24,18 @@ def _to_uuid(raw_value) -> uuid.UUID | None:
 
 
 def _user_to_dict(user: User) -> dict:
+    scoped = get_user_branch_ids(user)
+    if scoped is None:
+        branch_ids: list[str] | None = None
+    else:
+        branch_ids = [str(b) for b in scoped]
     return {
         "id": str(user.id),
         "username": user.username,
         "email": user.email,
         "role": user.role,
         "partner_id": str(user.partner_id),
-        "branch_id": str(user.branch_id) if user.branch_id else None,
+        "branch_ids": branch_ids,
         "is_active": user.is_active,
         "pin_locked": user.pin_locked,
     }
@@ -38,14 +45,22 @@ def list_users(current_user: dict, db: Session, page: int = 1, page_size: int = 
     query = db.query(User)
     role = current_user.get("role", "")
     partner_id = current_user.get("partner_id")
-    branch_id = current_user.get("branch_id")
+    allowed_branches = get_user_branch_ids(current_user)
 
     if role == "DEVELOPER":
         pass
     elif role == "OWNER":
         query = query.filter(User.partner_id == _to_uuid(partner_id))
     elif role == "BRANCH_MASTER":
-        query = query.filter(User.branch_id == _to_uuid(branch_id))
+        # List only users who share at least one branch with the branch_master.
+        if allowed_branches:
+            query = (
+                query.filter(User.partner_id == _to_uuid(partner_id))
+                     .filter(User.branches.any(Branch.id.in_(allowed_branches)))
+            )
+        else:
+            # No branches assigned → see nobody (except self by partner scope)
+            query = query.filter(User.partner_id == _to_uuid(partner_id))
     else:
         query = query.filter(User.partner_id == _to_uuid(partner_id))
 
@@ -66,7 +81,32 @@ def get_user(user_id: uuid.UUID, current_user: dict, db: Session) -> dict:
     return _user_to_dict(user)
 
 
-def _check_create_permission(current_user: dict, payload: dict, db: Session):
+def _resolve_branch_ids_from_payload(payload: dict) -> list[uuid.UUID]:
+    """Accept branch_ids (list or single value)."""
+    if payload.get("branch_ids") is not None:
+        raw = payload["branch_ids"]
+    else:
+        raw = []
+
+    # Be tolerant to clients that send one branch as scalar instead of array.
+    if isinstance(raw, (str, uuid.UUID)):
+        items = [raw]
+    elif isinstance(raw, (list, tuple, set)):
+        items = list(raw)
+    else:
+        items = []
+
+    resolved: list[uuid.UUID] = []
+    for v in items:
+        u = _to_uuid(v)
+        if u is None:
+            raise HTTPException(status_code=400, detail=f"Invalid branch id: {v}")
+        if u not in resolved:
+            resolved.append(u)
+    return resolved
+
+
+def _check_create_permission(current_user: dict, payload: dict, branch_ids: list, db: Session):
     """ตรวจสอบว่า current_user มีสิทธิ์สร้าง user ด้วย role และ branch ที่ระบุ"""
     role = current_user.get("role", "").upper()
     current_rank = ROLE_RANK.get(role, -1)
@@ -82,16 +122,34 @@ def _check_create_permission(current_user: dict, payload: dict, db: Session):
     if target_rank >= current_rank:
         raise HTTPException(status_code=403, detail="Cannot create user with equal or higher role")
 
-    # BRANCH_MASTER ต้องสร้างเฉพาะ branch ตัวเอง
+    # Role-level branch requirements
+    if target_role in ("BRANCH_MASTER", "ADMIN", "TRAINER") and not branch_ids:
+        raise HTTPException(status_code=400, detail="branch_ids is required for this role")
+
+    # All target branches must belong to the actor's partner
+    actor_partner_id = _to_uuid(current_user.get("partner_id"))
+    if branch_ids and actor_partner_id:
+        owned_ids = {
+            bid for (bid,) in db.query(Branch.id)
+                                 .filter(Branch.id.in_(branch_ids),
+                                         Branch.partner_id == actor_partner_id)
+                                 .all()
+        }
+        missing = [b for b in branch_ids if b not in owned_ids]
+        if missing:
+            raise HTTPException(status_code=403, detail="One or more branch_ids are outside your partner")
+
+    # BRANCH_MASTER may only assign branches they themselves belong to
     if role == "BRANCH_MASTER":
-        my_branch_id = str(current_user.get("branch_id", ""))
-        target_branch_id = str(payload.get("branch_id", ""))
-        if my_branch_id and target_branch_id and my_branch_id != target_branch_id:
-            raise HTTPException(status_code=403, detail="Cannot create user in another branch")
+        my_branch_ids = set(get_user_branch_ids(current_user) or [])
+        for target_bid in branch_ids:
+            if target_bid not in my_branch_ids:
+                raise HTTPException(status_code=403, detail="Cannot create user in another branch")
 
 
 def create_user(payload: dict, current_user: dict, db: Session) -> dict:
-    _check_create_permission(current_user, payload, db)
+    branch_ids = _resolve_branch_ids_from_payload(payload)
+    _check_create_permission(current_user, payload, branch_ids, db)
 
     existing = db.query(User).filter_by(email=payload["email"]).first()
     if existing:
@@ -100,7 +158,6 @@ def create_user(payload: dict, current_user: dict, db: Session) -> dict:
     partner_id = _to_uuid(current_user.get("partner_id"))
     user = User(
         partner_id=partner_id,
-        branch_id=_to_uuid(payload.get("branch_id")),
         username=payload["username"],
         email=payload["email"],
         password_hash=hash_password(payload.get("password", "changeme")),
@@ -108,6 +165,10 @@ def create_user(payload: dict, current_user: dict, db: Session) -> dict:
         role=payload.get("role", "ADMIN"),
         is_active=payload.get("is_active", True),
     )
+    # Attach branches (many-to-many)
+    if branch_ids:
+        attached = db.query(Branch).filter(Branch.id.in_(branch_ids)).all()
+        user.branches = attached
     db.add(user)
     db.flush()
 
@@ -120,9 +181,17 @@ def update_user(user_id: uuid.UUID, payload: dict, current_user: dict, db: Sessi
     user = db.query(User).filter_by(id=user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    for field in ["username", "email", "role", "is_active", "branch_id"]:
+    for field in ["username", "email", "role", "is_active"]:
         if field in payload:
             setattr(user, field, payload[field])
+    # Multi-branch update: accept branch_ids only
+    if "branch_ids" in payload:
+        branch_ids = _resolve_branch_ids_from_payload(payload)
+        if branch_ids:
+            attached = db.query(Branch).filter(Branch.id.in_(branch_ids)).all()
+            user.branches = attached
+        else:
+            user.branches = []
     if payload.get("password"):
         user.password_hash = hash_password(payload["password"])
     db.flush()

@@ -107,7 +107,10 @@ def get_line_qr(
     ดู LINE QR codes — developer QR + branch QR ตาม branch ของ user
     ในระบบจริงดึงจาก line_qr_codes table
     """
-    branch_id = current_user.get("branch_id")
+    from api.dependencies.branch_scope import get_user_branch_ids
+    allowed = get_user_branch_ids(current_user)
+    # Multi-branch: use first branch for the QR URL; None if unrestricted or empty
+    branch_id = allowed[0] if allowed else None
 
     developer_qr_url = "/static/qr/developer.png"
     branch_qr_url = f"/static/qr/branch_{branch_id}.png" if branch_id else None

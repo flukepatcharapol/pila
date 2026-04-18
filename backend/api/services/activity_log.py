@@ -40,12 +40,18 @@ def log(
     """
     sub = current_user.get("sub")
     partner_id = current_user.get("partner_id")
-    branch_id = current_user.get("branch_id")
+
+    # Pick a representative branch for the log entry:
+    #   - unrestricted (OWNER/DEVELOPER) → None
+    #   - scoped role → first branch in the user's list (None if no branches)
+    from api.dependencies.branch_scope import get_user_branch_ids
+    allowed = get_user_branch_ids(current_user)
+    branch_id = None if not allowed else allowed[0]
 
     entry = ActivityLog(
         user_id=_to_uuid(sub),
         partner_id=_to_uuid(partner_id),
-        branch_id=_to_uuid(branch_id),
+        branch_id=branch_id,
         action=action,
         target_type=target_type,
         target_id=str(target_id),

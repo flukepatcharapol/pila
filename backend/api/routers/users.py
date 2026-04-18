@@ -1,6 +1,6 @@
 """api/routers/users.py"""
 from uuid import UUID
-from typing import Optional
+from typing import Optional, List
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -18,7 +18,8 @@ class CreateUserRequest(BaseModel):
     password: Optional[str] = None
     pin: Optional[str] = None
     role: str = "ADMIN"
-    branch_id: Optional[str] = None
+    # Multi-branch field. Empty/omitted for OWNER/DEVELOPER.
+    branch_ids: Optional[List[str]] = None
     is_active: bool = True
 
 
@@ -27,7 +28,7 @@ class UpdateUserRequest(BaseModel):
     email: Optional[str] = None
     password: Optional[str] = None
     role: Optional[str] = None
-    branch_id: Optional[str] = None
+    branch_ids: Optional[List[str]] = None
     is_active: Optional[bool] = None
 
 

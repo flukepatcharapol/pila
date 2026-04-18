@@ -9,6 +9,7 @@ from fastapi import HTTPException
 
 from api.models.trainer import Caretaker
 from api.services.activity_log import log as activity_log
+from api.dependencies.branch_scope import get_user_branch_ids, assert_branch_access
 
 MAX_PAGE_SIZE = 100
 
@@ -33,10 +34,10 @@ def _to_dict(caretaker: Caretaker) -> dict:
 
 
 def _apply_scope(query, current_user: dict):
-    """Filter caretakers ตาม role"""
+    """Filter caretakers ตาม role (multi-branch)."""
     role = current_user.get("role", "")
     partner_id = current_user.get("partner_id")
-    branch_id = current_user.get("branch_id")
+    allowed = get_user_branch_ids(current_user)
 
     if role == "DEVELOPER":
         pass
@@ -46,8 +47,10 @@ def _apply_scope(query, current_user: dict):
             Branch.partner_id == _to_uuid(partner_id)
         )
     else:
-        if branch_id:
-            query = query.filter(Caretaker.branch_id == _to_uuid(branch_id))
+        if allowed:
+            query = query.filter(Caretaker.branch_id.in_(allowed))
+        else:
+            query = query.filter(Caretaker.id == uuid.UUID(int=0))
 
     return query
 
@@ -79,11 +82,10 @@ def create_caretaker(payload: dict, current_user: dict, db: Session) -> dict:
     """สร้าง caretaker — admin ทำได้เฉพาะ branch ตัวเอง"""
     branch_id = _to_uuid(payload["branch_id"])
     role = current_user.get("role", "")
-    user_branch_id = _to_uuid(current_user.get("branch_id"))
 
-    # ตรวจสอบว่า admin ไม่สร้าง caretaker ให้ branch อื่น
-    if role == "ADMIN" and user_branch_id and user_branch_id != branch_id:
-        raise HTTPException(status_code=403, detail="Admin can only create caretakers for own branch")
+    # Admin ต้องสร้าง caretaker เฉพาะ branch ที่ตัวเองเข้าถึงได้
+    if role == "ADMIN":
+        assert_branch_access(current_user, branch_id)
 
     caretaker = Caretaker(
         branch_id=branch_id,

@@ -55,7 +55,8 @@ def list_active_sessions(
     sessions = db.query(UserSession).filter_by(user_id=user_id, is_active=True).all()
     return {
         "sessions": [
-            {"jti": session.token_jti, "created_at": str(session.created_at)}
+            {"jti": session.token_jti, "created_at": str(session.created_at),
+            "access_token": session.access_token}
             for session in sessions
         ]
     }

@@ -148,6 +148,9 @@ def upgrade() -> None:
     op.add_column('user_sessions', sa.Column('email', sa.String(length=255), nullable=True))
     op.execute("DELETE FROM user_sessions WHERE email IS NULL")
     op.alter_column('user_sessions', 'email', nullable=False)
+    op.alter_column('user_sessions', 'access_token',
+               existing_type=sa.TEXT(),
+               nullable=False)
     op.alter_column('user_sessions', 'token_jti',
                existing_type=sa.VARCHAR(length=255),
                nullable=False)

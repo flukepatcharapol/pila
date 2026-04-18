@@ -20,6 +20,7 @@ from api.models.booking import Booking
 from api.models.customer_hour import CustomerHourLog
 from api.models.user import User
 from api.models.trainer import Trainer
+from api.models.branch import Branch
 
 
 def _to_uuid(raw_value) -> uuid.UUID | None:
@@ -39,20 +40,25 @@ def get_dashboard(current_user: dict, db: Session,
     ดึง dashboard data ตาม role + time range
     range_type: today|week|month|custom
     """
+    from api.dependencies.branch_scope import get_user_branch_ids
     role = current_user.get("role", "")
-    user_branch_id = _to_uuid(current_user.get("branch_id"))
     partner_id = _to_uuid(current_user.get("partner_id"))
+    scoped_branches = get_user_branch_ids(current_user)  # None = unrestricted
 
     # คำนวณ date range
     start_dt, end_dt = _resolve_date_range(range_type, start_date, end_date)
 
-    # กำหนด branch scope สำหรับ query
-    # branch_id param override ใน owner+ เท่านั้น
-    effective_branch_id = None
+    # กำหนด branch scope สำหรับ query (multi-branch)
+    # - scoped role → ทุก branch ใน list ตัวเอง (unless explicit branch_id override valid)
+    # - OWNER/DEVELOPER → None (partner-wide) unless branch_id passed
+    effective_branch_ids: list | None = None
     if role in ("ADMIN", "TRAINER", "BRANCH_MASTER"):
-        effective_branch_id = user_branch_id
+        if branch_id and scoped_branches is not None and branch_id in scoped_branches:
+            effective_branch_ids = [branch_id]
+        else:
+            effective_branch_ids = list(scoped_branches or [])
     elif role in ("OWNER", "DEVELOPER") and branch_id:
-        effective_branch_id = branch_id
+        effective_branch_ids = [branch_id]
 
     # คำนวณ metrics พื้นฐาน
     customer_q = db.query(Customer)
@@ -65,15 +71,22 @@ def get_dashboard(current_user: dict, db: Session,
     )
 
     # Apply scope
-    if effective_branch_id:
-        customer_q = customer_q.filter(Customer.branch_id == effective_branch_id)
-        order_q = order_q.filter(Order.branch_id == effective_branch_id)
-        booking_q = booking_q.filter(Booking.branch_id == effective_branch_id)
-        deduct_q = deduct_q.filter(CustomerHourLog.branch_id == effective_branch_id)
+    if effective_branch_ids:
+        customer_q = customer_q.filter(Customer.branch_id.in_(effective_branch_ids))
+        order_q = order_q.filter(Order.branch_id.in_(effective_branch_ids))
+        booking_q = booking_q.filter(Booking.branch_id.in_(effective_branch_ids))
+        deduct_q = deduct_q.filter(CustomerHourLog.branch_id.in_(effective_branch_ids))
     elif role == "OWNER" and partner_id:
         # owner เห็นทุก branch ใน partner — filter ด้วย partner_id
         customer_q = customer_q.filter(Customer.partner_id == partner_id)
         order_q = order_q.filter(Order.partner_id == partner_id)
+        # bookings / hour logs ไม่มี partner_id โดยตรง — scope ผ่าน branch
+        booking_q = booking_q.join(Branch, Booking.branch_id == Branch.id).filter(
+            Branch.partner_id == partner_id
+        )
+        deduct_q = deduct_q.join(Branch, CustomerHourLog.branch_id == Branch.id).filter(
+            Branch.partner_id == partner_id
+        )
 
     # Orders ใน date range
     order_q_period = order_q.filter(

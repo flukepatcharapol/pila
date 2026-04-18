@@ -64,7 +64,11 @@ def deduct(customer_id: uuid.UUID, trainer_id: uuid.UUID | None, branch_id: uuid
     after = max(0.0, before - DEDUCT_AMOUNT)
     balance.remaining = after
 
-    branch_id = branch_id or _to_uuid(current_user.get("branch_id"))
+    if branch_id is None:
+        from api.dependencies.branch_scope import get_user_branch_ids
+        _allowed = get_user_branch_ids(current_user)
+        if _allowed and len(_allowed) == 1:
+            branch_id = _allowed[0]
     user_id = _to_uuid(current_user.get("sub"))
 
     # บันทึก log ธุรกรรม
@@ -167,10 +171,14 @@ def list_log(current_user: dict, db: Session, page: int = 1, page_size: int = 20
     query = db.query(CustomerHourLog)
 
     # scope filter ตาม role
+    from api.dependencies.branch_scope import get_user_branch_ids
     role = current_user.get("role", "")
-    user_branch_id = _to_uuid(current_user.get("branch_id"))
-    if role not in ("DEVELOPER", "OWNER") and user_branch_id:
-        query = query.filter(CustomerHourLog.branch_id == user_branch_id)
+    allowed = get_user_branch_ids(current_user)
+    if role not in ("DEVELOPER", "OWNER"):
+        if allowed:
+            query = query.filter(CustomerHourLog.branch_id.in_(allowed))
+        else:
+            query = query.filter(CustomerHourLog.id == uuid.UUID(int=0))
 
     if customer_id:
         query = query.filter(CustomerHourLog.customer_id == customer_id)
@@ -222,9 +230,13 @@ def trainer_report(current_user: dict, db: Session,
     query = db.query(CustomerHourLog).filter(
         CustomerHourLog.transaction_type == "HOUR_DEDUCT"
     )
-    user_branch_id = _to_uuid(current_user.get("branch_id"))
-    if role not in ("DEVELOPER", "OWNER") and user_branch_id:
-        query = query.filter(CustomerHourLog.branch_id == user_branch_id)
+    from api.dependencies.branch_scope import get_user_branch_ids
+    allowed = get_user_branch_ids(current_user)
+    if role not in ("DEVELOPER", "OWNER"):
+        if allowed:
+            query = query.filter(CustomerHourLog.branch_id.in_(allowed))
+        else:
+            query = query.filter(CustomerHourLog.id == uuid.UUID(int=0))
 
     if trainer_id:
         query = query.filter(CustomerHourLog.trainer_id == trainer_id)

@@ -38,23 +38,24 @@ def _to_dict(trainer: Trainer) -> dict:
 
 
 def _apply_scope(query, current_user: dict):
-    """Filter trainers ตาม role — admin/trainer เห็นแค่ branch ตัวเอง"""
+    """Filter trainers ตาม role — admin/trainer เห็นแค่ branch ตัวเอง (multi-branch)."""
+    from api.dependencies.branch_scope import get_user_branch_ids
     role = current_user.get("role", "")
     partner_id = current_user.get("partner_id")
-    branch_id = current_user.get("branch_id")
+    allowed = get_user_branch_ids(current_user)
 
     if role == "DEVELOPER":
         pass  # เห็นทุก trainer ในทุก partner
     elif role == "OWNER":
-        # owner เห็นทุก branch ใน partner ตัวเอง — ต้อง join branch
         from api.models.branch import Branch
         query = query.join(Branch, Trainer.branch_id == Branch.id).filter(
             Branch.partner_id == _to_uuid(partner_id)
         )
     else:
-        # BRANCH_MASTER, ADMIN, TRAINER — เห็นแค่ branch ตัวเอง
-        if branch_id:
-            query = query.filter(Trainer.branch_id == _to_uuid(branch_id))
+        if allowed:
+            query = query.filter(Trainer.branch_id.in_(allowed))
+        else:
+            query = query.filter(Trainer.id == uuid.UUID(int=0))
 
     return query
 

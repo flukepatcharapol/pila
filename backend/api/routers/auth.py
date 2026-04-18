@@ -28,6 +28,7 @@ from api.dependencies.auth import (
     verify_password_session,
 )
 from api.services import auth as auth_service
+from api.services.page_access import get_page_access_for_role
 from api.models.user import PasswordSession
 from fastapi.security import HTTPAuthorizationCredentials
 
@@ -157,6 +158,18 @@ def get_me(
     except (ValueError, KeyError):
         raise HTTPException(status_code=401, detail="Invalid user context")
     return auth_service.get_me(user_id, db)
+
+
+@router.get("/auth/page-access")
+def get_page_access(
+    current_user: dict = Depends(require_pin_verified),
+):
+    """
+    FE bootstrap endpoint.
+    Call after login+pin verification to get allowed sidebar pages for current role.
+    """
+    role = current_user.get("role", "")
+    return get_page_access_for_role(role)
 
 
 # ─── Internal Developer-only ───────────────────────────────────────────────────

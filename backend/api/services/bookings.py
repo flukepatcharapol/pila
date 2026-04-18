@@ -50,22 +50,23 @@ def _booking_to_dict(booking: Booking) -> dict:
 
 
 def _apply_scope(query, current_user: dict):
-    """กรอง bookings ตาม role"""
+    """กรอง bookings ตาม role (multi-branch)."""
+    from api.dependencies.branch_scope import get_user_branch_ids
     role = current_user.get("role", "")
     partner_id = current_user.get("partner_id")
-    branch_id = current_user.get("branch_id")
+    allowed = get_user_branch_ids(current_user)
     if role == "DEVELOPER":
         pass
     elif role == "OWNER":
-        # owner เห็นทุก branch ใน partner — join ผ่าน Branch
         from api.models.branch import Branch
         query = query.join(Branch, Booking.branch_id == Branch.id).filter(
             Branch.partner_id == _to_uuid(partner_id)
         )
     else:
-        # BRANCH_MASTER, ADMIN, TRAINER — เห็นแค่ branch ตัวเอง
-        if branch_id:
-            query = query.filter(Booking.branch_id == _to_uuid(branch_id))
+        if allowed:
+            query = query.filter(Booking.branch_id.in_(allowed))
+        else:
+            query = query.filter(Booking.id == uuid.UUID(int=0))
     return query
 
 
